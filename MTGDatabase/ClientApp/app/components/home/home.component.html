@@ -1,0 +1,87 @@
+<h1>Card Catalog</h1>
+
+<!--<table class="table">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Name</th>
+            <th scope="col">Current Value</th>
+            <th scope="col">Set</th>
+            <th scope="col">Color 1</th>
+            <th scope="col">Color 2</th>
+            <th scope="col">Color 3</th>
+            <th scope="col">Rarity</th>
+            <th scope="col">Converted Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th scope="row">1</th>
+            <td><input (keyup)="onKey($event)" ng-model="cardName" placeholder="Card Name Here" /></td>
+            <td>{{color1}}</td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{cardSet}}
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" (click)="setSet('GRN')" >GRN</a>
+                        <a class="dropdown-item" (click)="setSet('RNA')" >RNA</a>
+                        <a class="dropdown-item" (click)="setSet('DOM')" >DOM</a>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="btn-group mr-2" role="group" aria-label="First group">
+                    <button type="button" (click)="setColor('Black')" class="btn" style="background-color:black;color:white;">B</button>
+                    <button type="button" (click)="setColor('Red')" class="btn btn-danger">R</button>
+                    <button type="button" (click)="setColor('Blue')" class="btn btn-primary">U</button>
+                    <button type="button" (click)="setColor('White')" class="btn" style="background-color:wheat;color:black;">W</button>
+                    <button type="button" (click)="setColor('Green')" class="btn btn-success">G</button>
+                    <button type="button" (click)="setColor('Colorless')" class="btn">N</button>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>-->
+
+<!--<button class="btn">
+    Add Row
+</button>
+
+<button (click)="addCard(cardName)" class="btn">
+    Add {{cardName}}
+</button>-->
+
+<p *ngIf="!cards"><em>Loading...</em></p>
+
+<table class='table' *ngIf="cards">
+    <thead>
+        <tr>
+            <th><input type="text" [(ngModel)]="queryString" id="search" placeholder="Search"></th>
+            <th>Collected</th>
+            <th>Color 1</th>
+            <th>Color 2</th>
+            <th>Rarity</th>
+            <th>Mana Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let card of cards | cardNameFilter: queryString">
+            <td>{{ card.name }}</td>
+            <td>
+                {{ card.numberInCollection }}
+                <button type="button" (click)="incrementCardCount(card)" class="btn btn-sm" >+</button> <!--(click)="incrementCardCount(card.partitionKey,card.name)"-->
+                <button type="button" (click)="decrementCardCount(card)" class="btn btn-sm ">-</button> <!--(click)="decrementCardCount(card.partitionKey,card.name)"-->
+            </td>
+            <td>{{ card.color1 }}</td>
+            <td>{{ card.color2 }}</td>
+            <td>{{ card.rarity }}</td>
+            <td>{{ card.convertedCost }}</td>
+            <td *ngIf="card.numberInCollection > 0">
+                <button type="button" (click)="removeCard(card)" class="btn btn-sm btn-danger">Delete Card</button>
+            </td>
+            <td *ngIf="card.numberInCollection < 1" >Card Removed</td>
+        </tr>
+    </tbody>
+</table>
