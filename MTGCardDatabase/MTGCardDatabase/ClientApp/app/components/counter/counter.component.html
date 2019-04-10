@@ -1,0 +1,65 @@
+<h2>Get Cards from Scryfall</h2>
+
+<input type="text" [(ngModel)]="setQuery" id="search" placeholder="Search for a Card">
+<button (click)="getCard(setQuery)" class="btn">Search Cards</button>
+
+<h4 *ngIf="showError">{{errorText}}</h4>
+
+<!--<input type="text" [(ngModel)]="queryString" id="search" placeholder="Search Cards">-->
+<!--<table class='table' *ngIf="cards.length > 0">
+    <thead>
+        <tr>
+            <th>Card Name</th>
+            <th>Color 1</th>
+            <th>Color 2</th>
+            <th>Rarity</th>
+            <th>Mana Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let card of cards | cardNameFilter: queryString">
+            <td><button style="margin-right:5px;" *ngIf="!card.added" class="btn-sm" (click)="addCard(card)">+</button>{{ card.name }} </td>
+            <td *ngIf="card.colors">{{ card.colors[0] }}</td>
+            <td *ngIf="card.colors">{{ card.colors[1] }}</td>
+            <td>{{ card.rarity }}</td>
+            <td>
+                <span class="mana" *ngFor="let mana of card.full_cost" style="margin-bottom:5px;">
+                    <p style="position:absolute;margin-left:1px;margin-top:1px;" *ngIf="isDigit(mana)">{{mana}}</p>
+                    <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>-->
+
+<div class="row" style="margin-top:15px;" *ngFor="let card of cards | cardNameFilter: queryString">
+    <div class="card mb-3" style="margin-bottom:25px;">
+        <div class="row no-gutters">
+            <div class="col-sm-4 col-md-2">
+                <img src={{card.image_small}} class="card-img" alt={{card.name}}>
+            </div>
+            <div class="col-sm-8 col-md-8 pull-left">
+                <div class="card-body">
+                    <h3 class="card-title">{{card.name}}</h3>
+                    <span class="mana" *ngFor="let mana of card.full_cost" style="margin-bottom:5px;">
+                        <p style="position:absolute;margin-left:1px;margin-top:1px;" *ngIf="isDigit(mana)">{{mana}}</p>
+                        <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
+                    </span>
+                    <p class="card-text">{{card.card_text}}</p>
+                    <p class="card-text"></p>
+                    <a *ngIf="!card.added" (click)="addCard(card)" class="btn btn-sm btn-primary">Add to Collection</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<button *ngIf="cards.length > 0" (click)="getNewPage()" >Next Page</button>
+                                        [ngClass]="{'badge-danger':card.mana_cost === '{R}'}"
+                                    [class.badge-danger]="card.mana_cost === '{R}'"
+
+    'background-color':card.mana_cost === '{R}' ? 'red' : 'black',
+    'background-color':card.mana_cost === '{W}' ? 'wheat' : 'black',
+    'background-color':card.mana_cost === '{G}' ? 'green' : 'black'
+
+    -->

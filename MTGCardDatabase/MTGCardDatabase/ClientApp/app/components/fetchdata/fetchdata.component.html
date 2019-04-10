@@ -1,0 +1,81 @@
+<h1>Decks</h1>
+<div class="row">
+    <div class="col-sm-1">R: {{ourCube.redCards}}</div>
+    <div class="col-sm-1">W: {{ourCube.whiteCards}}</div>
+    <div class="col-sm-1">U: {{ourCube.blueCards}}</div>
+    <div class="col-sm-1">G: {{ourCube.greenCards}}</div>
+    <div class="col-sm-1">B: {{ourCube.blackCards}}</div>
+    <div class="col-sm-1">A: {{ourCube.artifactCards}}</div>
+    <div class="col-sm-1">L: {{ourCube.landCards}}</div>
+</div>
+
+downloadButtonPush
+<button class="btn" (click)="downloadButtonPush()">Download CSV</button>
+<!--<button class="btn" (click)="getDecks('Charlie')">Charlie's Decks</button>-->
+<!--<table class='table' *ngIf="decks">
+    <thead>
+        <tr>
+            <th>Deck Name</th>
+            <th>Colors?</th>
+            <th>Summary</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let deck of decks">
+            <td>{{ deck.name }}</td>
+            <td>{{ deck.color1 }}</td>
+            <td><button class="btn" (click)="getDeckCards(deck.partitionKey, deck.name)">Get Deck Cards</button></td>
+
+            <td>
+                <div class="list-group">
+                    <a class="list-group-item list-group-item-action" *ngFor="let card of deckCards">
+                        {{card.name}}
+                    </a>
+                </div>
+            </td>
+
+        </tr>
+    </tbody>
+</table>-->
+
+<table class='table' *ngIf="decks">
+    <thead>
+        <tr>
+            <th><input type="text" [(ngModel)]="queryString" id="search" placeholder="Search"></th>
+            <th>Colors</th>
+            <th><input type="text" [(ngModel)]="cardTextString" id="cardTextSearch" placeholder="Search"></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let card of deckCards | cardNameFilter: queryString | cardTextFilter: cardTextString; let i = index">
+            <td>{{card.name}}</td>
+            <td>{{card.color1}}</td>
+            <td>{{card.card_Text}}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<!--<button class="btn" (click)="getDecks('Charlie','Goblins')">Add New Deck</button>-->
+<!--<p>This component demonstrates fetching data from the server.</p>
+
+<p *ngIf="!forecasts"><em>Loading...</em></p>
+
+<table class='table' *ngIf="forecasts">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Temp. (C)</th>
+            <th>Temp. (F)</th>
+            <th>Summary</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let forecast of forecasts">
+            <td>{{ forecast.dateFormatted }}</td>
+            <td>{{ forecast.temperatureC }}</td>
+            <td>{{ forecast.temperatureF }}</td>
+            <td>{{ forecast.summary }}</td>
+        </tr>
+    </tbody>
+</table>-->
