@@ -1,0 +1,304 @@
+<h1>Card Catalog</h1>
+
+<!--<table class="table">
+    <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Name</th>
+            <th scope="col">Current Value</th>
+            <th scope="col">Set</th>
+            <th scope="col">Color 1</th>
+            <th scope="col">Color 2</th>
+            <th scope="col">Color 3</th>
+            <th scope="col">Rarity</th>
+            <th scope="col">Converted Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th scope="row">1</th>
+            <td><input (keyup)="onKey($event)" ng-model="cardName" placeholder="Card Name Here" /></td>
+            <td>{{color1}}</td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{cardSet}}
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" (click)="setSet('GRN')" >GRN</a>
+                        <a class="dropdown-item" (click)="setSet('RNA')" >RNA</a>
+                        <a class="dropdown-item" (click)="setSet('DOM')" >DOM</a>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="btn-group mr-2" role="group" aria-label="First group">
+                    <button type="button" (click)="setColor('Black')" class="btn" style="background-color:black;color:white;">B</button>
+                    <button type="button" (click)="setColor('Red')" class="btn btn-danger">R</button>
+                    <button type="button" (click)="setColor('Blue')" class="btn btn-primary">U</button>
+                    <button type="button" (click)="setColor('White')" class="btn" style="background-color:wheat;color:black;">W</button>
+                    <button type="button" (click)="setColor('Green')" class="btn btn-success">G</button>
+                    <button type="button" (click)="setColor('Colorless')" class="btn">N</button>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>-->
+<!--<button class="btn">
+    Add Row
+</button>
+
+<button (click)="addCard(cardName)" class="btn">
+    Add {{cardName}}
+</button>-->
+
+<p *ngIf="!cards[1]"><em>Loading...</em></p>
+
+<!--<div *ngIf="cards[1]">
+        <div class="row" *ngFor="let card of cards | cardNameFilter: queryString; let i = index">
+            <div class="col-md-5">
+                <div class="accordion">
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <h4 class="mb-0">
+                                <a style="color:black;text-decoration:none;" class="collapsed" data-toggle="collapse" [attr.data-target]="'#'+i" aria-expanded="false" aria-controls="collapseOne">
+                                    {{card.name}}
+                                </a>
+                            </h4>
+                        </div>
+
+                        <div [attr.id]="i" class="collapse" aria-labelledby="headingOne">
+                            <div class="col-md-4">
+                                <img src={{card.image_small}} />
+                            </div>
+                            <div class="card-body col-md-8">
+                                <h4>{{card.card_text}}</h4><br />
+                                <h4><i>{{card.flavor_text}}</i></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <h4 style="float:left;margin-right:10px;">{{ card.numberInCollection }}</h4>
+                <button type="button" (click)="incrementCardCount(card)" class="btn btn-sm">+</button>
+                <button type="button" (click)="decrementCardCount(card)" class="btn btn-sm ">-</button>
+            </div>
+            <div class="col-md-1"><h4>{{ card.rarity }}</h4></div>
+            <div class="col-md-1">
+                <span class="badge" [ngStyle]="{'background-color':getColor(card)}">{{ card.mana_cost }}</span>
+            </div>
+            <div class="col-md-1">{{card.partitionKey | uppercase }}</div>
+            <div class="col-md-1" *ngIf="card.numberInCollection > 0">
+                <button type="button" (click)="removeCard(card)" class="btn btn-sm btn-danger">Delete Card</button>
+            </div>
+            <div class="col-md-1" *ngIf="card.numberInCollection < 1">Card Removed</div>
+        </div>
+</div>-->
+<!--<table class='table table-hover' *ngIf="cards[1]">
+    <thead>
+        <tr>
+            <th><input type="text" [(ngModel)]="queryString" id="search" placeholder="Search"></th>
+            <th>Collected</th>
+            <th><select [(ngModel)]="rarityString" value="Rarity">
+                <option value="">All</option>
+                <option value="mythic">Mythic</option>
+                <option value="rare">Rare</option>
+                <option value="uncommon">Uncommon</option>
+                <option value="common">Common</option>
+            </select>
+
+            </th>
+            <th>Mana Cost</th>
+            <th>Set</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let card of cards | cardRarityFilter: rarityString | cardNameFilter: queryString; let i = index">
+            <td>
+                <div class="accordion" id="accordion Example">
+                    <div class="card">
+                        <h4 class="mb-0">
+                            <a style="color:black;text-decoration:none;" class="collapsed" data-toggle="collapse" [attr.data-target]="'#'+i" aria-expanded="false" aria-controls="collapseOne">
+                                {{card.name}}
+                            </a>
+                        </h4>
+
+                        <div [attr.id]="i" class="collapse" aria-labelledby="headingOne" data-parent="#accordion Example">
+                            <div class="col-md-4">
+                                <img src={{card.image_Small}} />
+                            </div>
+                            <div class="card-body col-md-4">
+                                <h4>{{card.card_Text}}</h4><br />
+                                <h4><i>{{card.flavor_Text}}</i></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+
+            <td>
+                <span class="mana" *ngFor="let mana of card.full_Cost" >
+                   <p style="position:absolute;margin-left:1px;margin-top:1px;" *ngIf="isDigit(mana)">{{mana}}</p>
+                   <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
+                </span>
+
+            </td>
+            <td>{{card.partitionKey | uppercase }}</td>
+            <td *ngIf="card.numberInCollection > 0">
+                <button type="button" (click)="addCard(card)" class="btn btn-sm">Add to Cube</button>
+            </td>
+            <td *ngIf="card.numberInCollection > 0">
+                <button type="button" (click)="removeCard(card)" class="btn btn-sm btn-danger">Delete Card</button>
+            </td>
+            <td *ngIf="card.numberInCollection < 1">Card Removed</td>
+        </tr>
+    </tbody>
+</table>-->
+
+
+<div class="row" style="margin-bottom:25px;">
+    
+    <div class="col-sm-6">
+        <select [(ngModel)]="rarityString" value="Rarity">
+            <option value="">All</option>
+            <option value="mythic">Mythic</option>
+            <option value="rare">Rare</option>
+            <option value="uncommon">Uncommon</option>
+            <option value="common">Common</option>
+        </select>
+
+        <input type="text" [(ngModel)]="queryString" id="search" placeholder="Search">
+    </div>
+    <div style="margin-top:5px;" class="col-sm-6 pull-left">
+        <a (click)="setFilter('G')" *ngIf="!greenFilter"><img src="../../assets/magic-mana-small/mana_g.png" style="height:25px;width:25px;" /></a>
+        <a (click)="setFilter('G')" *ngIf="greenFilter"><img src="../../assets/magic-mana-embossed/mana_g.png" style="height:25px;width:25px;" /></a>
+
+        <a (click)="setFilter('R')" *ngIf="!redFilter"><img src="../../assets/magic-mana-small/mana_r.png" style="height:25px;width:25px;" /></a>
+        <a (click)="setFilter('R')" *ngIf="redFilter"><img src="../../assets/magic-mana-embossed/mana_r.png" style="height:25px;width:25px;" /></a>
+
+        <a (click)="setFilter('U')" *ngIf="!blueFilter"><img src="../../assets/magic-mana-small/mana_u.png" style="height:25px;width:25px;" /></a>
+        <a (click)="setFilter('U')" *ngIf="blueFilter"><img src="../../assets/magic-mana-embossed/mana_u.png" style="height:25px;width:25px;" /></a>
+
+        <a (click)="setFilter('B')" *ngIf="!blackFilter"><img src="../../assets/magic-mana-small/mana_b.png" style="height:25px;width:25px;" /></a>
+        <a (click)="setFilter('B')" *ngIf="blackFilter"><img src="../../assets/magic-mana-embossed/mana_b.png" style="height:25px;width:25px;" /></a>
+
+        <a (click)="setFilter('W')" *ngIf="!whiteFilter"><img src="../../assets/magic-mana-small/mana_w.png" style="height:25px;width:25px;" /></a>
+        <a (click)="setFilter('W')" *ngIf="whiteFilter"><img src="../../assets/magic-mana-embossed/mana_w.png" style="height:25px;width:25px;" /></a>
+    </div>
+</div>
+
+<div class="row" *ngFor="let card of cards | cardRarityFilter: rarityString | cardTextFilter: queryString; let i = index">
+    <!--| cardNameFilter: queryString-->
+    <div class="card mb-3" style="margin-bottom:25px;">
+        <div class="row no-gutters">
+            <div class="col-sm-4 col-md-4">
+                <img src={{card.image_Small}} class="card-img" alt={{card.name}}>
+            </div>
+            <div class="col-sm-8 col-md-8">
+                <div class="card-body">
+                    <h3 class="card-title">{{card.name}}</h3>
+                    <span class="mana" *ngFor="let mana of card.full_Cost" style="margin-bottom:5px;">
+                        <p style="position:absolute;margin-left:1px;margin-top:1px;" *ngIf="isDigit(mana)">{{mana}}</p>
+                        <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
+                    </span>
+                    <p class="card-text">{{card.card_Text}}</p>
+                    <p class="card-text"></p>
+                    <a (click)="addCard(card)" class="btn btn-sm btn-primary">Add to Cube</a>
+                    <div class="row" style="margin-top:10px;">
+                        <div class="col-xs-4">
+                            <h4 style="float:left;margin-right:10px;">{{ card.numberInCollection }}</h4>
+                            <button type="button" (click)="incrementCardCount(card)" class="btn btn-sm">+</button>
+                            <button type="button" (click)="decrementCardCount(card)" class="btn btn-sm ">-</button>
+                        </div>
+                        <div class="col-xs-2">
+                            <p *ngIf="card.numberInCollection > 0">
+                                <button type="button" (click)="removeCard(card)" class="btn btn-sm btn-danger">Delete Card</button>
+                            <p *ngIf="card.numberInCollection < 1">Card Removed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--<div class="col-sm-2">
+        <div class="card" style="width: 18rem;">
+            <img src={{card.image_Small}} class="card-img-top" alt={{card.flavor_Text}}>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <h3 class="card-title">{{card.name}}</h3>
+                    <span class="mana" *ngFor="let mana of card.full_Cost">
+                        <p style="position:absolute;margin-left:1px;margin-top:1px;" *ngIf="isDigit(mana)">{{mana}}</p>
+                        <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
+                    </span>
+                </div>
+                <h6>{{ card.rarity }} - {{card.partitionKey | uppercase }}</h6>
+                <p class="card-text">{{card.card_Text}}</p>
+                <a (click)="addCard(card)" class="btn btn-primary">Add to Cube</a>
+                <div class="row">
+                    <h4 style="float:left;margin-right:10px;">{{ card.numberInCollection }}</h4>
+                    <button type="button" (click)="incrementCardCount(card)" class="btn btn-sm">+</button>
+                    <button type="button" (click)="decrementCardCount(card)" class="btn btn-sm ">-</button>
+                    <div>
+                        <p *ngIf="card.numberInCollection > 0">
+                            <button type="button" (click)="removeCard(card)" class="btn btn-sm btn-danger">Delete Card</button>
+                        <p *ngIf="card.numberInCollection < 1">Card Removed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>-->
+</div>
+
+<!--<div class="accordion" id="accordionExample">
+    <div class="card">
+        <div class="card-header" id="headingOne">
+            <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Collapsible Group Item #1
+                </button>
+            </h2>
+        </div>
+
+        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
+            <div class="card-body">
+                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+            </div>
+        </div>
+    </div>
+</div>-->
+<!--<div>
+    <div class="card">
+        <div class="card-header" id="headingTwo">
+            <h2 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Collapsible Group Item #2
+                </button>
+            </h2>
+        </div>
+        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
+            <div class="card-body">
+                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" id="headingThree">
+            <h2 class="mb-0">
+                <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Collapsible Group Item #3
+                </button>
+            </h2>
+        </div>
+        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
+            <div class="card-body">
+                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+            </div>
+        </div>
+    </div>
+</div>-->
