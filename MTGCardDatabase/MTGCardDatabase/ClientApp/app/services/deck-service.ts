@@ -1,17 +1,21 @@
 ﻿import { Injectable, Inject } from "@angular/core";
 import { Http, Response } from '@angular/http';
+import { DeckTrackerRow, Deck } from '../interfaces/interfaces';
 
 @Injectable()
 export class DeckService {
 
     private _baseUrl = '';
+    public decks: Deck[] = [];
 
     constructor(private http: Http, @Inject('BASE_URL') baseUrl: string) {
         this._baseUrl = baseUrl;
     }
 
     getDecks(owner: string) {
-        return this.http.get(this._baseUrl + 'api/decks/' + owner);
+        return this.http.get(this._baseUrl + 'api/decks/' + owner).subscribe(result => {
+            this.decks = result.json();
+        });
     }
 
     addDeck(_ownerName: string, _name: string) {
@@ -25,7 +29,11 @@ export class DeckService {
         return this.http.post(this._baseUrl + 'api/decks/addDeck', newDeck)
             .subscribe(data => { }, error => {
                 alert(error.json());
-            });
+            },
+            () => {
+                this.getDecks(_ownerName);
+            }
+        );
     }
 
     addCard(_name: string, _set: string, _color1: string, _color2: string, _rarity: string, _convertedCost: string, _numberInCollection: number) {
@@ -102,6 +110,17 @@ export class DeckService {
 
     getDeckCards(playerDeck: string) {
         return this.http.get(this._baseUrl + 'api/decks/cards/' + playerDeck);
+    }
+
+    addDeckTrackerRow(deckTrackerRow: DeckTrackerRow) {
+        return this.http.post(this._baseUrl + 'api/decks/deckTracker', deckTrackerRow)
+            .subscribe(data => { }, error => {
+                alert(error.json());
+            });
+    }
+
+    getDeckTrackerRows(deck: Deck) {
+        return this.http.get(this._baseUrl + 'api/decks/deckTracker' + deck);
     }
 
 }

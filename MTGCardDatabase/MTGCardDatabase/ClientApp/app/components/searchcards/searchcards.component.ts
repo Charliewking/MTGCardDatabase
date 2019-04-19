@@ -3,13 +3,14 @@ import { Http } from '@angular/http';
 import { HttpCardService } from '../../services/http-service';
 import { ScryfallService } from '../../services/scryfall.service';
 import { CardNamePipe } from '../../pipes/card-name.pipe';
+import { Card } from '../../interfaces/interfaces';
 
 @Component({
-    selector: 'counter',
-    templateUrl: './counter.component.html',
+    selector: 'searchcards',
+    templateUrl: './searchcards.component.html',
     providers: [HttpCardService, ScryfallService]
 })
-export class CounterComponent {
+export class SearchCardsComponent {
     public queryString: string = '';
     public setQuery: string = '';
     public cards: Card[] = [];
@@ -44,19 +45,7 @@ export class CounterComponent {
     }
 
     getCard(name: string) {
-        this.scryfallService.getCard(name).subscribe(result => {
-                this.showError = false;
-                let card: Card = result.json();
-                card.mana_cost = card.mana_cost.substr(1, (card.mana_cost.length - 2));
-                card.full_cost = card.mana_cost.split("}{");
-                card.image_small = (result.json()).image_uris.small;
-                card.card_text = (result.json()).oracle_text;
-                this.cards[0] = card;
-            },
-            error => {
-                this.showError = true;
-                this.errorText = (error.json()).details;
-            });
+        this.scryfallService.getCard(name);
     }
 
     getNewPage() {
@@ -66,31 +55,31 @@ export class CounterComponent {
     }
 
     addCard(card: Card) {
-        this._httpCardService.addCard(card, 1);
-        card.added = true;
+        this._httpCardService.addCard(card);
+        //card.added = true;
     }
 
 
     getColor(card: Card) {
-        if (card.mana_cost == null) {
+        if (card.mana_Cost == null) {
             return 'grey'
         }
-        else if (card.colors[1]) {
+        else if (card.color2 != "") {
             return 'gold'
         }
-        else if (card.mana_cost.includes('R')) {
+        else if (card.mana_Cost.includes('R')) {
             return 'red'
         }
-        else if (card.mana_cost.includes('U')) {
+        else if (card.mana_Cost.includes('U')) {
             return 'blue'
         }
-        else if (card.mana_cost.includes('G')) {
+        else if (card.mana_Cost.includes('G')) {
             return 'green'
         }
-        else if (card.mana_cost.includes('W')) {
+        else if (card.mana_Cost.includes('W')) {
             return 'wheat'
         }
-        else if (card.mana_cost.includes('B')) {
+        else if (card.mana_Cost.includes('B')) {
             return 'black'
         }
         else {
@@ -147,28 +136,4 @@ interface CardCollection {
     color2: string;
     rarity: string;
     convertedCost: string;
-}
-
-interface Card {
-    PartitionKey: string;
-    RowKey: string;
-    name: string;
-    set: string;
-    colors: string[];
-    rarity: string;
-    mana_cost: string;
-    added: boolean;
-    power: string;
-    type_line: string;
-    color_identity: string;
-    toughness: string;
-    image_small: string;
-    card_text: string;
-    flavor_text: string;
-    numberInCollection: number;
-    cmc: string;
-    image_uris: any;
-    set_name: string;
-    oracle_text: string;
-    full_cost: string[];
 }

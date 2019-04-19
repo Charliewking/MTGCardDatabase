@@ -52,7 +52,7 @@
     Add {{cardName}}
 </button>-->
 
-<p *ngIf="!cards[1]"><em>Loading...</em></p>
+<p *ngIf="!_httpCardService.cards[1]"><em>Loading...</em></p>
 
 <!--<div *ngIf="cards[1]">
         <div class="row" *ngFor="let card of cards | cardNameFilter: queryString; let i = index">
@@ -188,12 +188,12 @@
     </div>
 </div>
 
-<div class="row" *ngFor="let card of cards | cardRarityFilter: rarityString | cardTextFilter: queryString; let i = index">
+<div class="row" style="margin-left:5%;" *ngFor="let card of _httpCardService.cards | cardRarityFilter: rarityString | cardTextFilter: queryString; let i = index">
     <!--| cardNameFilter: queryString-->
     <div class="card mb-3" style="margin-bottom:25px;">
-        <div class="row no-gutters">
+        <div class="row">
             <div class="col-sm-4 col-md-4">
-                <img src={{card.image_Small}} class="card-img" alt={{card.name}}>
+                <!--<img src={{card.image_Small}} class="card-img" alt={{card.name}}>-->
             </div>
             <div class="col-sm-8 col-md-8">
                 <div class="card-body">

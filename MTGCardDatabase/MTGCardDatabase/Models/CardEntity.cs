@@ -16,9 +16,12 @@ namespace MTGDatabase.Models
 
         public CardEntity() { }
         public string Name { get; set; }
+        public string Colors { get; set; }
         public string Color1 { get; set; }
         public string Color2 { get; set; }
         public string Color3 { get; set; }
+        public string Color4 { get; set; }
+        public string Color5 { get; set; }
         public string Rarity { get; set; }
         public int Power { get; set; }
         public int Toughness { get; set; }

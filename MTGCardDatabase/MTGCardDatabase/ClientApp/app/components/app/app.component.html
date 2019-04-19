@@ -1,10 +1,45 @@
 <div class='container-fluid'>
-    <div class='row'>
-        <div class='col-sm-3'>
-            <nav-menu></nav-menu>
-        </div>
-        <div class='col-sm-9 body-content'>
+    <div class='main-nav'>
+        <nav class='navbar navbar-inverse'>
+            <div class='navbar-header'>
+                <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+                    <span class='sr-only'>Toggle navigation</span>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                </button>
+                <a class='navbar-brand' [routerLink]="['/collection']">MTGCardDatabase</a>
+            </div>
+            <div class='clearfix'></div>
+            <div class='navbar-collapse collapse'>
+                <ul class='nav navbar-nav'>
+                    <li [routerLinkActive]="['link-active']">
+                        <a [routerLink]="['/collection']">
+                            <span class='glyphicon glyphicon-home'></span> Card Collection
+                        </a>
+                    </li>
+                    <li [routerLinkActive]="['link-active']">
+                        <a [routerLink]="['/searchcards']">
+                            <span class='glyphicon glyphicon-education'></span> Get Cards
+                        </a>
+                    </li>
+                    <li [routerLinkActive]="['link-active']">
+                        <a [routerLink]="['/deck']">
+                            <span class='glyphicon glyphicon-th-list'></span> Decks
+                        </a>
+                    </li>
+                    <li [routerLinkActive]="['link-active']">
+                        <a [routerLink]="['/preview']">
+                            <span class='glyphicon glyphicon-star'></span> Preview
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+    <!--<div class='row'>-->
+        <div class='body-content'>
             <router-outlet></router-outlet>
         </div>
-    </div>
+    <!--</div>-->
 </div>

@@ -5,6 +5,7 @@
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <IsPackable>false</IsPackable>
+    <UserSecretsId>9b693395-c4e8-45d9-a1e0-65255e7e1614</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,12 +24,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\app\components\preview\preview.component.ts" />
+    <None Remove="ClientApp\app\interfaces\interfaces.ts" />
     <None Remove="ClientApp\app\pipes\card-rarity.pipe.ts" />
     <None Remove="ClientApp\app\pipes\card-text.pipe.ts" />
     <None Remove="ClientApp\app\styles\mana-cost.ts" />
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\app\components\preview\preview.component.ts" />
+    <TypeScriptCompile Include="ClientApp\app\interfaces\interfaces.ts" />
     <TypeScriptCompile Include="ClientApp\app\pipes\card-rarity.pipe.ts" />
     <TypeScriptCompile Include="ClientApp\app\pipes\card-text.pipe.ts" />
     <TypeScriptCompile Include="ClientApp\app\styles\mana-cost.ts" />

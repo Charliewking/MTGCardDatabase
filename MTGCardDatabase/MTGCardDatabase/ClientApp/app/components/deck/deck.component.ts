@@ -1,15 +1,16 @@
 import { Component, Inject } from '@angular/core';
-import { Http } from '@angular/http';
 import { DeckService } from '../../services/deck-service'
+import { HttpCardService } from '../../services/http-service'
 import { CardNamePipe } from '../../pipes/card-name.pipe';
 import { CardTextPipe } from '../../pipes/card-text.pipe';
+import { Card, Deck, DeckTrackerRow, Player } from '../../interfaces/interfaces';
 
 @Component({
-    selector: 'fetchdata',
-    templateUrl: './fetchdata.component.html',
-    providers: [ DeckService ]
+    selector: 'deck',
+    templateUrl: './deck.component.html',
+    providers: [DeckService]
 })
-export class FetchDataComponent {
+export class DeckComponent {
     //public forecasts: WeatherForecast[] = [];
 
     //constructor(http: Http, @Inject('BASE_URL') baseUrl: string) {
@@ -21,16 +22,27 @@ export class FetchDataComponent {
     public scope = this;
     public decks: Deck[] = [];
     public deckCards: Card[] = [];
+    public deckOwner: string = '';
+    public deckName: string = '';
 
     public _deckService: DeckService;
+    public _cardService: HttpCardService;
+
+    public players: Player[] = [
+        { "name": "Ironstream" },
+        { "name": "MediaPlay" },
+        { "name": "BronzeSword" },
+        { "name": "AJSnips" },
+    ]
 
     ngOnInit() {
-        this.getDeckCards("Charlie", "Saprolings");
-        this.getDecks("Charlie");
+        //this.getDeckCards("Charlie", "Saprolings");
+        //this.getDecks("Charlie");
     }
 
-    constructor(private deckService: DeckService) {
+    constructor(private deckService: DeckService, private cardService: HttpCardService) {
         this._deckService = deckService;
+        this._cardService = cardService;
 
         this.ourCube.redCards = 0;
         this.ourCube.blackCards = 0;
@@ -43,17 +55,20 @@ export class FetchDataComponent {
     }
 
     getDecks(owner: string) {
-        this._deckService.getDecks(owner).subscribe(result => {
-            this.decks = result.json();
-        });
+        this._deckService.getDecks(owner);
+    }
+
+    createNewDeck() {
+        this.newDeck(this.deckOwner, this.deckName);
+        this.deckName = '';
     }
 
     newDeck(owner: string, name: string) {
         this._deckService.addDeck(owner, name);
     }
 
-    getDeckCards(owner: string, deckName: string) {
-        this._deckService.getDeckCards(owner + "_" + deckName).subscribe(result => {
+    getDeckCards(deckName: string) {
+        this._deckService.getDeckCards(this.deckOwner + "_" + deckName).subscribe(result => {
             this.deckCards = result.json();
             //this.getCubeStats();
         });
@@ -61,9 +76,6 @@ export class FetchDataComponent {
 
     getCubeStats() {
         for (let card of this.deckCards) {
-            if (card.color2 != " ") {
-                continue;
-            }
             if (card.color1 == "W") {
                 this.ourCube.whiteCards++;
             }
@@ -79,7 +91,7 @@ export class FetchDataComponent {
             if (card.color1 == "G") {
                 this.ourCube.greenCards++;
             }
-            if (card.color1 == " ") {
+            if (card.type_Line.includes("Land")) {
                 this.ourCube.landCards++;
             }
         }
@@ -141,39 +153,6 @@ export class FetchDataComponent {
     }
 }
 
-interface Deck {
-    name: string;
-    owner: string;
-    colors: string[];
-    color1: string;
-    mainDeck: Card[];
-    sideBoard: Card[];
-}
-
-interface Card {
-    PartitionKey: string;
-    RowKey: string;
-    name: string;
-    set: string;
-    colors: string[];
-    color1: string;
-    color2: string;
-    rarity: string;
-    mana_cost: string;
-    added: boolean;
-    power: string;
-    type_line: string;
-    color_identity: string;
-    toughness: string;
-    image_small: string;
-    card_text: string;
-    flavor_text: string;
-    numberInCollection: number;
-    cmc: string;
-    image_uris: any;
-    set_name: string;
-    oracle_text: string;
-}
 
 interface Cube {
     redCards: number;

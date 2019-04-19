@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MTGCardDatabase.Models;
 using MTGDatabase.Models;
 
 namespace MTGCardDatabase
@@ -33,6 +34,7 @@ namespace MTGCardDatabase
                 options.cardTableName = Configuration["TableNames:cardTable"];
                 options.deckTableName = Configuration["TableNames:deckTable"];
                 options.deckCardTableName = Configuration["TableNames:deckcardTable"];
+                options.deckTrackerTableName = Configuration["TableNames:deckTrackerTable"];
                 options.cubeStats = Configuration["TableNames:cubeStats"];
             });
         }

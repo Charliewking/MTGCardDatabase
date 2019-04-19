@@ -1,5 +1,5 @@
 <h1>Decks</h1>
-<div class="row">
+<!--<div class="row">
     <div class="col-sm-1">R: {{ourCube.redCards}}</div>
     <div class="col-sm-1">W: {{ourCube.whiteCards}}</div>
     <div class="col-sm-1">U: {{ourCube.blueCards}}</div>
@@ -7,10 +7,11 @@
     <div class="col-sm-1">B: {{ourCube.blackCards}}</div>
     <div class="col-sm-1">A: {{ourCube.artifactCards}}</div>
     <div class="col-sm-1">L: {{ourCube.landCards}}</div>
-</div>
+</div>-->
+<!--<button class="btn" (click)="downloadButtonPush()">Download CSV</button>-->
 
-downloadButtonPush
-<button class="btn" (click)="downloadButtonPush()">Download CSV</button>
+
+
 <!--<button class="btn" (click)="getDecks('Charlie')">Charlie's Decks</button>-->
 <!--<table class='table' *ngIf="decks">
     <thead>
@@ -38,12 +39,33 @@ downloadButtonPush
     </tbody>
 </table>-->
 
-<table class='table' *ngIf="decks">
+<div class="row">
+    <div class="col-sm-6">
+        <select class="form-control" [(ngModel)]="deckOwner" (change)="getDecks(deckOwner)">
+            <option *ngFor="let player of players" value="{{player.name}}">{{player.name}}</option>
+        </select>
+        <input type="text" [(ngModel)]="deckName" id="search" placeholder="DeckName">
+        <button [disabled]="!deckOwner || !deckName" class="btn" (click)="createNewDeck()">Add New Deck</button>
+    </div>
+    <div class="col-sm-6">
+        <ul class="list-group" *ngIf="_deckService.decks" style="max-height:200px;overflow:auto;">
+            <li *ngFor="let deck of _deckService.decks" class="list-group-item">
+                <a style="display:block;text-decoration:none;" (click)="getDeckCards(deck.name)">{{deck.name}}</a>
+                <!--<button type="button" class="btn" (click)="getDeckCards(deck.name)">Get Cards</button>-->
+            </li>
+        </ul>
+    </div>
+</div>
+
+<hr style="margin-top:10px;margin-bottom:10px;" />
+
+<table class='table' *ngIf="_deckService.decks">
     <thead>
         <tr>
             <th><input type="text" [(ngModel)]="queryString" id="search" placeholder="Search"></th>
             <th>Colors</th>
             <th><input type="text" [(ngModel)]="cardTextString" id="cardTextSearch" placeholder="Search"></th>
+            <th>In collection</th>
         </tr>
     </thead>
     <tbody>
@@ -51,31 +73,28 @@ downloadButtonPush
             <td>{{card.name}}</td>
             <td>{{card.color1}}</td>
             <td>{{card.card_Text}}</td>
+            <td>{{card.numberInCollection}}</td>
         </tr>
     </tbody>
 </table>
 
 
-<!--<button class="btn" (click)="getDecks('Charlie','Goblins')">Add New Deck</button>-->
-<!--<p>This component demonstrates fetching data from the server.</p>
 
-<p *ngIf="!forecasts"><em>Loading...</em></p>
-
-<table class='table' *ngIf="forecasts">
+<table class='table' *ngIf="_deckService.decks">
     <thead>
         <tr>
-            <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
+            <th><input type="text" [(ngModel)]="queryString" id="search" placeholder="Search"></th>
+            <th>Colors</th>
+            <th><input type="text" [(ngModel)]="cardTextString" id="cardTextSearch" placeholder="Search"></th>
+            <th>In collection</th>
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let forecast of forecasts">
-            <td>{{ forecast.dateFormatted }}</td>
-            <td>{{ forecast.temperatureC }}</td>
-            <td>{{ forecast.temperatureF }}</td>
-            <td>{{ forecast.summary }}</td>
+        <tr *ngFor="let card of deckCards | cardNameFilter: queryString | cardTextFilter: cardTextString; let i = index">
+            <td>{{card.name}}</td>
+            <td>{{card.color1}}</td>
+            <td>{{card.card_Text}}</td>
+            <td>{{card.numberInCollection}}</td>
         </tr>
     </tbody>
-</table>-->
+</table>

@@ -1,16 +1,15 @@
 import { Component, Inject } from '@angular/core';
-import { Http } from '@angular/http';
 import { HttpCardService } from '../../services/http-service';
 import { CardNamePipe } from '../../pipes/card-name.pipe';
 import { DeckService } from '../../services/deck-service';
-import { forEach } from '@angular/router/src/utils/collection';
+import { Card } from '../../interfaces/interfaces';
 
 @Component({
     selector: 'collection',
     templateUrl: './collection.component.html'
 })
 export class CollectionComponent {
-    public cards: CardCollection[] = [];
+    public cards: Card[] = [];
 
     public _httpCardService: HttpCardService;
     public _deckService: DeckService;
@@ -31,7 +30,8 @@ export class CollectionComponent {
 
     ngOnInit() {
         // call some function that gets either a cache or new cards if no cache
-        this.getCards();
+        this._httpCardService.getCards();
+        //this.getCards();
     }
 
     constructor(private httpCardService: HttpCardService, private deckService: DeckService) {
@@ -81,7 +81,7 @@ export class CollectionComponent {
 
     getCardsWithFilter(filter: string) {
         this._httpCardService.getCardsWithFilter(filter).subscribe(result => {
-            var returnCards = result.json() as CardCollection[];
+            var returnCards = result.json() as Card[];
 
             for (let card of returnCards) {
                 card.mana_Cost = card.mana_Cost.substr(1, (card.mana_Cost.length - 2));
@@ -105,23 +105,15 @@ export class CollectionComponent {
     }
 
     getCards() {
-        this.cards = [];
-        this._httpCardService.getCards().subscribe(result => {
-            this.cards = result.json() as CardCollection[];
-
-            for (let card of this.cards) {
-                card.mana_Cost = card.mana_Cost.substr(1, (card.mana_Cost.length-2));
-                card.full_Cost = card.mana_Cost.split("}{");
-            }
-        });
+        this.cards = this._httpCardService.cards
     }
 
     addCard(card: Card) {
-        this._deckService.addCardToDeck('Charlie_Saprolings', card.rowKey, card.partitionKey);
+        this._deckService.addCardToDeck('Charlie_Saprolings', card.name, card.set_Short);
     }
 
     removeCard(card: Card) {
-        this._httpCardService.removeCard(card.partitionKey, card.name);
+        this._httpCardService.removeCard(card.set_Short, card.name);
         card.numberInCollection = 0;
     }
 
@@ -139,12 +131,12 @@ export class CollectionComponent {
 
     incrementCardCount(card: Card) {
         //_set: string, _name: string
-        this._httpCardService.incrementCardCount(card.partitionKey, card.name);
+        this._httpCardService.incrementCardCount(card.set_Short, card.name);
         card.numberInCollection++;
     }
 
     decrementCardCount(card: Card) {
-        this._httpCardService.decrementCardCount(card.partitionKey, card.name);
+        this._httpCardService.decrementCardCount(card.set_Short, card.name);
         card.numberInCollection--;
     }
 
@@ -221,41 +213,4 @@ export class CollectionComponent {
     public blackPath: string = require("../../assets/magic-mana-small/mana_b.png");
     public whitePath: string = require("../../assets/magic-mana-small/mana_w.png");
     public circlePath: string = require("../../assets/magic-mana-small/mana_circle.png");
-}
-
-
-
-interface CardCollection {
-    name: string;
-    color1: string;
-    color2: string;
-    rarity: string;
-    convertedCost: string;
-    mana_Cost: string;
-    image_small: string;
-    card_text: string;
-    flavor_text: string;
-    full_Cost: string[];
-}
-
-interface Card {
-    partitionKey: string;
-    rowKey: string;
-    name: string;
-    set: string;
-    colors: string[];
-    rarity: string;
-    mana_Cost: string;
-    power: string;
-    type_Line: string;
-    color_Identity: string;
-    toughness: string;
-    image_Small: string;
-    card_Text: string;
-    flavor_Text: string;
-    numberInCollection: number;
-    cmc: string;
-    image_uris: any;
-    set_Name: string;
-    full_Cost: string[];
 }
