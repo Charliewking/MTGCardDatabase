@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MTGDatabase.Models;
 using Microsoft.WindowsAzure.Storage.Table;
+using MTGCardDatabase.Models;
 
 namespace MTGDatabase.Controllers
 {
@@ -16,16 +17,17 @@ namespace MTGDatabase.Controllers
     public class CardController : Controller
     {
         private readonly WebConfiguration _config;
-        private readonly string TableName = "cardthree";
+        //private TableStorageUtility _utility;
 
         public IActionResult Index()
         {
             return View();
         }
 
-        public CardController(IOptions<WebConfiguration> config)
+        public CardController(IOptions<WebConfiguration> config)  //, TableStorageUtility utility
         {
             _config = config.Value;
+           // _utility = utility;
         }
 
         [HttpGet]
@@ -39,7 +41,7 @@ namespace MTGDatabase.Controllers
 
             CloudTableClient client = account.CreateCloudTableClient();
 
-            CloudTable table = client.GetTableReference(TableName);
+            CloudTable table = client.GetTableReference(_config.cardTableName);
             TableContinuationToken token = null;
 
             //TableQuery<CardEntity> query = new TableQuery<CardEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "RNA"));
@@ -62,7 +64,7 @@ namespace MTGDatabase.Controllers
 
             CloudTableClient client = account.CreateCloudTableClient();
 
-            CloudTable table = client.GetTableReference(TableName);
+            CloudTable table = client.GetTableReference(_config.cardTableName);
             TableContinuationToken token = null;
 
             TableQuery<CardEntity> query = new TableQuery<CardEntity>().Where(TableQuery.GenerateFilterCondition("Color1", QueryComparisons.Equal, filter));
@@ -77,15 +79,10 @@ namespace MTGDatabase.Controllers
         [Route("addCard")]
         public async Task AddNewCard([FromBody]CardEntity card)
         {
-            CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(TableName);
+            card.PartitionKey = card.Set_Short;
+            card.RowKey = card.Name.Replace(" // ", " ");
 
-            //CardEntity newCard = new CardEntity(card.PartitionKey, card.RowKey);
-            //newCard.name = card.name;
-            //newCard.color1 = card.color1;
-            //newCard.color2 = card.color2;
-            //newCard.convertedCost = card.convertedCost;
-            //newCard.rarity = card.rarity;
-            //newCard.numberInCollection = card.numberInCollection;
+            CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(_config.cardTableName);
 
             await table.ExecuteAsync(TableOperation.Insert(card));
         }
@@ -93,54 +90,56 @@ namespace MTGDatabase.Controllers
         [Route("removeCard")]
         public async Task RemoveCard([FromBody]CardEntity Card)
         {
-            CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(TableName);
-
-            TableResult retrievedCard = await table.ExecuteAsync(TableOperation.Retrieve<CardEntity>(Card.PartitionKey, Card.RowKey)).ConfigureAwait(true);
-
-            CardEntity deleteCard = (CardEntity)retrievedCard.Result;
+            CardEntity deleteCard = await RetrieveCard(Card, _config.cardTableName);
             if (deleteCard != null)
             {
-                await table.ExecuteAsync(TableOperation.Delete(deleteCard));
+                await GetCloudTable(_config.cardTableName).ExecuteAsync(TableOperation.Delete(deleteCard));
             }
         }
 
         [Route("decrement")]
         public async Task DecrementCard([FromBody]CardEntity Card)
         {
-            CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(TableName);
+            CardEntity decrementCard = await RetrieveCard(Card, _config.cardTableName);
 
-            TableResult retrievedCard = await table.ExecuteAsync(TableOperation.Retrieve<CardEntity>(Card.PartitionKey, Card.RowKey)).ConfigureAwait(true);
-
-            CardEntity decrementCard = (CardEntity)retrievedCard.Result;
-
-            if(decrementCard != null)
+            if (decrementCard != null)
             {
                 decrementCard.NumberInCollection--;
 
-                await table.ExecuteAsync(TableOperation.Replace(decrementCard));
+                await GetCloudTable(_config.cardTableName).ExecuteAsync(TableOperation.Replace(decrementCard));
             }
         }
 
         [Route("increment")]
         public async Task IncrementCard([FromBody]CardEntity Card)
         {
-            CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(TableName);
-
-            TableResult retrievedCard = await table.ExecuteAsync(TableOperation.Retrieve<CardEntity>(Card.PartitionKey, Card.RowKey)).ConfigureAwait(true);
-
-            CardEntity decrementCard = (CardEntity)retrievedCard.Result;
+            CardEntity decrementCard = await RetrieveCard(Card, _config.cardTableName);
 
             if (decrementCard != null)
             {
                 decrementCard.NumberInCollection++;
 
-                await table.ExecuteAsync(TableOperation.Replace(decrementCard));
+                await GetCloudTable(_config.cardTableName).ExecuteAsync(TableOperation.Replace(decrementCard));
             }
+        }
+
+        private CloudTable GetCloudTable(string tableName)
+        {
+            return GetStorageAccount().CreateCloudTableClient().GetTableReference(tableName);
         }
 
         private CloudStorageAccount GetStorageAccount()
         {
             return CloudStorageAccount.Parse(_config.mtgdatabaseConnectionString);
+
+            //return _utility.GetStorageAccount();
+        }
+
+        private async Task<CardEntity> RetrieveCard(CardEntity Card, string tableName)
+        {
+            TableResult retrievedCard = await GetCloudTable(tableName).ExecuteAsync(TableOperation.Retrieve<CardEntity>(Card.PartitionKey, Card.RowKey.Replace(" // ", " "))).ConfigureAwait(true);
+
+            return (CardEntity)retrievedCard.Result;
         }
     }
 }

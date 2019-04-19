@@ -16,6 +16,7 @@ namespace MTGDatabase.Controllers
     public class DeckController : Controller
     {
         private readonly WebConfiguration _config;
+        private readonly TableContinuationToken token = null;
         public IActionResult Index()
         {
             return View();
@@ -38,7 +39,6 @@ namespace MTGDatabase.Controllers
             CloudTableClient client = account.CreateCloudTableClient();
 
             CloudTable table = client.GetTableReference("deck");
-            TableContinuationToken token = null;
 
             TableQuery<DeckEntity> query = new TableQuery<DeckEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, PlayerName));
 
@@ -54,7 +54,7 @@ namespace MTGDatabase.Controllers
         [Route("addDeck")]
         public async Task AddNewDeck([FromBody]DeckEntity deck)
         {
-            CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference("deck");
+            CloudTable table = GetStorageTable(_config.deckTableName);
 
             DeckEntity newDeck = new DeckEntity(deck.PartitionKey, deck.RowKey);
             newDeck.Name = deck.Name;
@@ -86,7 +86,7 @@ namespace MTGDatabase.Controllers
             {
                 TableQuery<CardEntity> finalQuery = new TableQuery<CardEntity>().Where(
                     TableQuery.CombineFilters(
-                        TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, deckCard.CardSet),
+                        TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, deckCard.CardSet.ToLower()),
                         TableOperators.And,
                         TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, deckCard.CardName)));
 
@@ -96,6 +96,26 @@ namespace MTGDatabase.Controllers
 
 
             return Ok(deckList);
+        }
+
+        [HttpPost]
+        [Route("deckTracker")]
+        public async Task AddDeckTrackerRow([FromBody] DeckTrackerEntity deckTrackerEntry)
+        {
+            CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(_config.deckTrackerTableName);
+            await table.ExecuteAsync(TableOperation.Insert(deckTrackerEntry));
+        }
+
+        [HttpGet]
+        [Route("deckTracker")]
+        public async Task<IActionResult> AddDeckTrackerRow([FromRoute] DeckEntity deck)
+        {
+            CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(_config.deckTrackerTableName);
+            TableQuery<DeckEntity> query = new TableQuery<DeckEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, deck.Name));
+
+            var returnValue = await table.ExecuteQuerySegmentedAsync(query, token);
+
+            return Ok(returnValue.ToList());
         }
 
         private CloudStorageAccount GetStorageAccount()

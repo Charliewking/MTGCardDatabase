@@ -10,8 +10,9 @@ import { DeckService } from './services/deck-service';
 import { AppComponent } from './components/app/app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { CollectionComponent } from './components/collection/collection.component';
-import { FetchDataComponent } from './components/fetchdata/fetchdata.component';
-import { CounterComponent } from './components/counter/counter.component';
+import { DeckComponent } from './components/deck/deck.component';
+import { SearchCardsComponent } from './components/searchcards/searchcards.component';
+import { PreviewComponent } from './components/preview/preview.component';
 import { CardNamePipe } from './pipes/card-name.pipe';
 import { CardTextPipe } from './pipes/card-text.pipe';
 import { CardRarityPipe } from './pipes/card-rarity.pipe';
@@ -20,9 +21,10 @@ import { CardRarityPipe } from './pipes/card-rarity.pipe';
     declarations: [
         AppComponent,
         NavMenuComponent,
-        CounterComponent,
-        FetchDataComponent,
+        SearchCardsComponent,
+        DeckComponent,
         CollectionComponent,
+        PreviewComponent,
         CardNamePipe,
         CardTextPipe,
         CardRarityPipe
@@ -34,8 +36,9 @@ import { CardRarityPipe } from './pipes/card-rarity.pipe';
         RouterModule.forRoot([
             { path: '', redirectTo: 'collection', pathMatch: 'full' },
             { path: 'collection', component: CollectionComponent },
-            { path: 'counter', component: CounterComponent },
-            { path: 'fetch-data', component: FetchDataComponent },
+            { path: 'searchcards', component: SearchCardsComponent },
+            { path: 'deck', component: DeckComponent },
+            { path: 'preview', component: PreviewComponent },
             { path: '**', redirectTo: 'collection' }
         ])
     ],

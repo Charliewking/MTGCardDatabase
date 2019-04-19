@@ -7,10 +7,14 @@ namespace MTGDatabase.Models
 {
     public class WebConfiguration
     {
-        public string mtgdatabaseConnectionString { get; set; }
-        public string cardTableName { get; set; }
-        public string deckTableName { get; set; }
-        public string deckCardTableName { get; set; }
-        public string cubeStats { get; set; }
+
+
+        internal string mtgdatabaseConnectionString { get; set; }
+        internal string cardTableName { get; set; }
+        internal string deckTableName { get; set; }
+        internal string deckCardTableName { get; set; }
+        internal string deckTrackerTableName;
+        internal string cubeStats { get; set; }
+
     }
 }

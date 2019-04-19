@@ -18,5 +18,6 @@ namespace MTGCardDatabase.Models
         public string CardName { get; set; }
         public string CardSet { get; set; }
         public int NumberInDeck { get; set; }
+        public int NumberInSideboard { get; set; }
     }
 }

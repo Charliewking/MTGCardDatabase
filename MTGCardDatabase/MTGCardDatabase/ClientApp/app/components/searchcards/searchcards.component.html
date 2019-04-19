@@ -1,6 +1,6 @@
 <h2>Get Cards from Scryfall</h2>
 
-<input type="text" [(ngModel)]="setQuery" id="search" placeholder="Search for a Card">
+<input type="text" (keyup.enter)="getCard(setQuery)" [(ngModel)]="setQuery" id="search" placeholder="Search for a Card">
 <button (click)="getCard(setQuery)" class="btn">Search Cards</button>
 
 <h4 *ngIf="showError">{{errorText}}</h4>
@@ -32,11 +32,11 @@
     </tbody>
 </table>-->
 
-<div class="row" style="margin-top:15px;" *ngFor="let card of cards | cardNameFilter: queryString">
+<div class="row" style="margin-top:15px;" *ngFor="let card of scryfallService.returnCards | cardNameFilter: queryString">
     <div class="card mb-3" style="margin-bottom:25px;">
         <div class="row no-gutters">
             <div class="col-sm-4 col-md-2">
-                <img src={{card.image_small}} class="card-img" alt={{card.name}}>
+                <img src={{card.image_Small}} class="card-img" alt={{card.name}}>
             </div>
             <div class="col-sm-8 col-md-8 pull-left">
                 <div class="card-body">
@@ -45,7 +45,7 @@
                         <p style="position:absolute;margin-left:1px;margin-top:1px;" *ngIf="isDigit(mana)">{{mana}}</p>
                         <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
                     </span>
-                    <p class="card-text">{{card.card_text}}</p>
+                    <p class="card-text">{{card.card_Text}}</p>
                     <p class="card-text"></p>
                     <a *ngIf="!card.added" (click)="addCard(card)" class="btn btn-sm btn-primary">Add to Collection</a>
                 </div>
