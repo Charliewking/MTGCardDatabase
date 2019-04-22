@@ -1,4 +1,4 @@
-﻿export { Card, ScryfallCard, Deck, DeckTrackerRow, Player };
+﻿export { Card, ScryfallCard, Deck, DeckTrackerRow, Player, DeckCard };
 
 interface Card {
     name: string;
@@ -23,6 +23,7 @@ interface Card {
     image_Small: any;
     image_Normal: any;
     image_Large: any;
+    price: string;
 }
 
 
@@ -47,6 +48,7 @@ interface ScryfallCard {
     set_name: string;
     oracle_text: string;
     card_faces: CardFace[];
+    usd: string;
 }
 
 interface CardFace {
@@ -54,7 +56,6 @@ interface CardFace {
 }
 
 interface DeckTrackerRow {
-
     owner: string;
     deckName: string;
     playedAgainst: string;
@@ -67,8 +68,19 @@ interface Deck {
     owner: string;
     name: string;
     colors: string[];
-    mainDeck: Card[];
-    sideBoard: Card[];
+    mainDeck: DeckCard[];
+    sideBoard: DeckCard[];
+}
+
+interface DeckCard {
+    cardName: string;
+    cardSet: string;
+    deckName: string;
+    mana_Cost: string;
+    numberInDeck: number;
+    numberInSideboard: number;
+    owner: string;
+    countLimited: boolean;
 }
 
 interface Player {

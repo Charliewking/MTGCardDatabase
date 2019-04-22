@@ -1,7 +1,5 @@
-<!--This file is currently unused-->
-
-<!--<div class='main-nav'>
-    <nav class='navbar navbar-inverse'>
+<div class='main-nav'>
+    <div class='navbar navbar-inverse navbar-fixed-top'>
         <div class='navbar-header'>
             <button type='button' class='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
                 <span class='sr-only'>Toggle navigation</span>
@@ -9,7 +7,7 @@
                 <span class='icon-bar'></span>
                 <span class='icon-bar'></span>
             </button>
-            <a class='navbar-brand' [routerLink]="['/collection']">MTGCardDatabase</a>
+            <a class='navbar-brand' [routerLink]="['/home']">MTGDatabase</a>
         </div>
         <div class='clearfix'></div>
         <div class='navbar-collapse collapse'>
@@ -20,21 +18,21 @@
                     </a>
                 </li>
                 <li [routerLinkActive]="['link-active']">
-                    <a [routerLink]="['/counter']">
+                    <a [routerLink]="['/searchcards']">
                         <span class='glyphicon glyphicon-education'></span> Get Cards
                     </a>
                 </li>
                 <li [routerLinkActive]="['link-active']">
-                    <a [routerLink]="['/fetch-data']">
+                    <a [routerLink]="['/deck']">
                         <span class='glyphicon glyphicon-th-list'></span> Decks
                     </a>
                 </li>
                 <li [routerLinkActive]="['link-active']">
                     <a [routerLink]="['/preview']">
-                        <span class='glyphicon glyphicon-th-list'></span> Preview
+                        <span class='glyphicon glyphicon-star'></span> Preview
                     </a>
                 </li>
             </ul>
         </div>
-    </nav>
-</div>-->
+    </div>
+</div>

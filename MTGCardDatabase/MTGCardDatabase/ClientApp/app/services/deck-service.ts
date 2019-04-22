@@ -1,6 +1,6 @@
 ﻿import { Injectable, Inject } from "@angular/core";
 import { Http, Response } from '@angular/http';
-import { DeckTrackerRow, Deck } from '../interfaces/interfaces';
+import { DeckTrackerRow, Deck, Card, DeckCard } from '../interfaces/interfaces';
 
 @Injectable()
 export class DeckService {
@@ -36,69 +36,14 @@ export class DeckService {
         );
     }
 
-    addCard(_name: string, _set: string, _color1: string, _color2: string, _rarity: string, _convertedCost: string, _numberInCollection: number) {
+    addCardToDeck(deckOwner: string, deckName: string, card: Card) {
 
-        var cardData = {
-            PartitionKey: _set,
-            RowKey: _name,
-            name: _name,
-            color1: _color1,
-            color2: _color1,
-            rarity: _rarity,
-            convertedCost: _convertedCost,
-            numberInCollection: _numberInCollection
-        };
-
-        return this.http.post(this._baseUrl + 'api/cards/addCard', cardData)
-            .subscribe(data => { }, error => {
-                alert(error.json());
-            });
-    }
-
-    removeCard(_set: string, _name: string) {
-        var deleteCard = {
-            PartitionKey: _set,
-            RowKey: _name
-        }
-
-        return this.http.post(this._baseUrl + 'api/cards/removeCard', deleteCard)
-            .subscribe(data => { }, error => {
-                alert(error.json());
-            });
-    }
-
-    incrementCardCount(_set: string, _name: string) {
-
-        var plusCard = {
-            PartitionKey: _set,
-            RowKey: _name
-        }
-
-        return this.http.post(this._baseUrl + 'api/cards/increment', plusCard)
-            .subscribe(data => { }, error => {
-                alert(error.json());
-            });
-    }
-
-    decrementCardCount(_set: string, _name: string) {
-
-        var plusCard = {
-            PartitionKey: _set,
-            RowKey: _name
-        }
-
-        return this.http.post(this._baseUrl + 'api/cards/decrement', plusCard)
-            .subscribe(data => { }, error => {
-                alert(error.json());
-            });
-    }
-
-    addCardToDeck(_ownerDeck: string, _cardName: string, _cardSet: string) {
         var deckCard = {
-            PartitionKey: _ownerDeck,
-            RowKey: _cardName,
-            CardName: _cardName,
-            CardSet: _cardSet,
+            Owner: deckOwner,
+            DeckName: deckName,
+            CardName: card.name,
+            CardSet: card.set_Short,
+            Mana_Cost: card.mana_Cost,
             NumberInDeck: 1
         }
 
@@ -106,6 +51,45 @@ export class DeckService {
             .subscribe(data => { }, error => {
                 alert(error.json());
             });
+    }
+
+    removeCardFromDeck(card: DeckCard) {
+        return this.http.post(this._baseUrl + 'api/deckcards/removeCardFromDeck', card)
+            .subscribe(data => { }, error => {
+                alert(error.json());
+            });
+    }
+
+    incrementDeckCard(card: DeckCard, sideBoard: boolean) {
+
+        if (sideBoard) {
+            return this.http.post(this._baseUrl + 'api/deckcards/incrementSideboard', card)
+                .subscribe(data => { }, error => {
+                    alert(error.json());
+                });
+        }
+        else {
+            return this.http.post(this._baseUrl + 'api/deckcards/increment', card)
+                .subscribe(data => { }, error => {
+                    alert(error.json());
+                });
+        }
+    }
+
+    decrementDeckCard(card: DeckCard, sideBoard: boolean) {
+
+        if (sideBoard) {
+            return this.http.post(this._baseUrl + 'api/deckcards/decrementSideboard', card)
+                .subscribe(data => { }, error => {
+                    alert(error.json());
+                });
+        }
+        else {
+            return this.http.post(this._baseUrl + 'api/deckcards/decrement', card)
+                .subscribe(data => { }, error => {
+                    alert(error.json());
+                });
+        }
     }
 
     getDeckCards(playerDeck: string) {

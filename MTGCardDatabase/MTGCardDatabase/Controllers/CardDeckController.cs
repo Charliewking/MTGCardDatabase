@@ -35,7 +35,6 @@ namespace MTGCardDatabase.Controllers
         [Route("{Player_Deck}")]
         public async Task<IActionResult> GetAllDeckCards([FromRoute] string Player_Deck)
         {
-
             CloudTable table = GetStorageTable(DeckCardTable);
             TableContinuationToken token = null;
 
@@ -49,13 +48,91 @@ namespace MTGCardDatabase.Controllers
         [Route("addCardToDeck")]
         public async Task AddCardToDeck([FromBody]DeckCardEntity deckCard)
         {
-            CloudTable table = GetStorageTable(_config.deckCardTableName);
-            await UpdateCubeStats(deckCard);
+            //await UpdateCubeStats(deckCard);
 
-            await table.ExecuteAsync(TableOperation.Insert(deckCard));
+            deckCard = isCountLimited(deckCard);
+
+            deckCard.PartitionKey = deckCard.Owner + "_" + deckCard.DeckName;
+            deckCard.RowKey = deckCard.CardName.Replace(" // ", " ");
+
+            await GetStorageTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Insert(deckCard));
         }
 
-        public async Task UpdateCubeStats(DeckCardEntity deckCard)
+        [Route("increment")]
+        public async Task IncrementDeckCard([FromBody]DeckCardEntity deckCard)
+        {
+            DeckCardEntity card = await RetrieveCard(deckCard, _config.deckCardTableName);
+
+            if (card != null)
+            {
+                if ((card.NumberInDeck + card.NumberInSideboard < 4) || !card.CountLimited)
+                {
+                    card.NumberInDeck++;
+                    await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Replace(card));
+                }
+            }
+        }
+        [Route("incrementSideboard")]
+        public async Task IncrementSideboard([FromBody]DeckCardEntity deckCard)
+        {
+            DeckCardEntity card = await RetrieveCard(deckCard, _config.deckCardTableName);
+
+            if (card != null) {
+                if ((card.NumberInDeck + card.NumberInSideboard < 4) || !card.CountLimited)
+                {
+                    card.NumberInSideboard++;
+                    await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Replace(card));
+                }
+            }
+        }
+        [Route("decrement")]
+        public async Task DecrementDeckCard([FromBody]DeckCardEntity deckCard)
+        {
+            DeckCardEntity card = await RetrieveCard(deckCard, _config.deckCardTableName);
+
+            if (card != null)
+            {
+                card.NumberInDeck--;
+                if(card.NumberInDeck == 0 && card.NumberInSideboard == 0)
+                {
+                    await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Delete(card));
+                }
+                else
+                {
+                    await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Replace(card));
+                }
+            }
+        }
+        [Route("decrementSideboard")]
+        public async Task DecrementSideboard([FromBody]DeckCardEntity deckCard)
+        {
+            DeckCardEntity card = await RetrieveCard(deckCard, _config.deckCardTableName);
+
+            if (card != null)
+            {
+                card.NumberInSideboard--;
+                if (card.NumberInDeck == 0 && card.NumberInSideboard == 0)
+                {
+                    await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Delete(card));
+                }
+                else
+                {
+                    await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Replace(card));
+                }
+            }
+        }
+
+        [Route("removeCardFromDeck")]
+        public async Task RemoveCard([FromBody]DeckCardEntity Card)
+        {
+            DeckCardEntity deleteCard = await RetrieveCard(Card, _config.deckCardTableName);
+            if (deleteCard != null)
+            {
+                await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Delete(deleteCard));
+            }
+        }
+
+        private async Task UpdateDeckStats(DeckCardEntity deckCard)
         {
             CloudTable table = GetStorageTable(_config.cubeStats);
 
@@ -115,9 +192,43 @@ namespace MTGCardDatabase.Controllers
             return returnCard;
         }
 
+        private CloudTable GetCloudTable(string tableName)
+        {
+            return GetStorageAccount().CreateCloudTableClient().GetTableReference(tableName);
+        }
+
+        private CloudStorageAccount GetStorageAccount()
+        {
+            return CloudStorageAccount.Parse(_config.mtgdatabaseConnectionString);
+
+            //return _utility.GetStorageAccount();
+        }
+
+        private async Task<DeckCardEntity> RetrieveCard(DeckCardEntity Card, string tableName)
+        {
+            TableResult retrievedCard = await GetCloudTable(tableName).ExecuteAsync(TableOperation.Retrieve<DeckCardEntity>(Card.PartitionKey, Card.RowKey)).ConfigureAwait(true);
+
+            return (DeckCardEntity)retrievedCard.Result;
+        }
+
         private CloudTable GetStorageTable(string tableName)
         {
             return (CloudStorageAccount.Parse(_config.mtgdatabaseConnectionString)).CreateCloudTableClient().GetTableReference(tableName);
         }
+
+        private DeckCardEntity isCountLimited(DeckCardEntity deckCard)
+        {
+            if(deckCard.CardName == "Mountain" || deckCard.CardName == "Plains" || deckCard.CardName == "Swamp" || deckCard.CardName == "Forest" || deckCard.CardName == "Island" || deckCard.CardName == "Rat Colony" || deckCard.CardName == "Persistent Petitioners")
+            {
+                deckCard.CountLimited = false;
+            }
+            else
+            {
+                deckCard.CountLimited = true;
+            }
+
+            return deckCard;
+        }
+
     }
 }

@@ -59,7 +59,65 @@
 
 <hr style="margin-top:10px;margin-bottom:10px;" />
 
-<table class='table' *ngIf="_deckService.decks">
+<div class="row">
+    <div class="col-sm-6"  *ngIf="deckCards">
+        <input type="text" (keyup.enter)="getCard(setQuery)" [(ngModel)]="setQuery" id="search" placeholder="Search for a Card">
+        <button (click)="getCard(setQuery)" class="btn">Search Cards</button>
+        <div class="row" style="margin-top:15px;" *ngFor="let card of scryfallService.returnCards | cardNameFilter: queryString">
+            <div class="card mb-3" style="margin-bottom:25px;">
+                <div class="row no-gutters">
+                    <div class="col-sm-4 col-md-2">
+                        <img src={{card.image_Small}} class="card-img" alt={{card.name}}>
+                    </div>
+                    <div class="col-sm-8 col-md-8 pull-left">
+                        <div class="card-body">
+                            <h3 class="card-title">{{card.name}}</h3>
+                            <span class="mana" *ngFor="let mana of card.full_cost" style="margin-bottom:5px;">
+                                <p style="position:absolute;margin-left:1px;margin-top:1px;" *ngIf="isDigit(mana)">{{mana}}</p>
+                                <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
+                            </span>
+                            <p class="card-text">{{card.card_Text}}</p>
+                            <p class="card-text"></p>
+                            <a *ngIf="!card.added" (click)="addCardToDeck(card)" class="btn btn-sm btn-primary">Add to Deck</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <table class='table' *ngIf="deckCards[0]">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th><input type="text" [(ngModel)]="queryString" id="search" placeholder="Search"></th>
+                    <th>Colors</th>
+                    <!--<th><input type="text" [(ngModel)]="cardTextString" id="cardTextSearch" placeholder="Search"></th>-->
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let card of deckCards | cardNameFilter: queryString | cardTextFilter: cardTextString; let i = index">
+                    <td>
+                        <div class="row">
+                            <a class="btn btn-sm" (click)="incrementDeckCard(card)"><i class="glyphicon-plus"></i></a>
+                            <h4>{{card.numberInDeck}}</h4>
+                            <a class="btn btn-sm" (click)="decrementDeckCard(card)"><i class="glyphicon-minus"></i></a>
+                        </div>
+                    </td>
+                    <td><h4>{{card.cardName}}</h4></td>
+                    <td>
+                        <div style="margin-top:-5px;">
+                            <mana-cost [mana]="card.mana_Cost"></mana-cost>
+                        </div>
+                    </td>
+                    <!--<td>{{card.card_Text}}</td>-->
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!--<table class='table' *ngIf="_deckService.decks">
     <thead>
         <tr>
             <th><input type="text" [(ngModel)]="queryString" id="search" placeholder="Search"></th>
@@ -76,25 +134,4 @@
             <td>{{card.numberInCollection}}</td>
         </tr>
     </tbody>
-</table>
-
-
-
-<table class='table' *ngIf="_deckService.decks">
-    <thead>
-        <tr>
-            <th><input type="text" [(ngModel)]="queryString" id="search" placeholder="Search"></th>
-            <th>Colors</th>
-            <th><input type="text" [(ngModel)]="cardTextString" id="cardTextSearch" placeholder="Search"></th>
-            <th>In collection</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let card of deckCards | cardNameFilter: queryString | cardTextFilter: cardTextString; let i = index">
-            <td>{{card.name}}</td>
-            <td>{{card.color1}}</td>
-            <td>{{card.card_Text}}</td>
-            <td>{{card.numberInCollection}}</td>
-        </tr>
-    </tbody>
-</table>
+</table>-->

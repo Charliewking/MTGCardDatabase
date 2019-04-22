@@ -8,3 +8,21 @@
         margin-right:25px;
     }
 }
+
+.navbar .container-fluid > .navbar-header {
+    float: left;
+    margin-right: 10px;
+}
+
+.navbar .navbar-nav {
+    float: left;
+    margin: 5px;
+}
+
+.nav > li {
+    float: left;
+}
+
+.navbar-nav {
+    flex-direction: row;
+}

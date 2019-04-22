@@ -109,7 +109,7 @@ export class CollectionComponent {
     }
 
     addCard(card: Card) {
-        this._deckService.addCardToDeck('Charlie_Saprolings', card.name, card.set_Short);
+        //this._deckService.addCardToDeck('Charlie_Saprolings', card.name, card.set_Short);
     }
 
     removeCard(card: Card) {
@@ -167,50 +167,11 @@ export class CollectionComponent {
         }
     }
 
-    isDigit(mana: string) {
-        if (mana == "X") {
-            return true;
-        }
-        return Number(mana);
-    }
+
 
     removeColor(color: string) {
         this.filters.forEach((item, index) => {
             if (item === color) this.filters.splice(index, 1);
         });
     }
-
-    getPath(mana: string) {
-        if (mana == null) {
-            return 'grey'
-        }
-        if (mana == ' ') {
-            return 'white'
-        }
-        else if (mana == 'R') {
-            return this.redPath
-        }
-        else if (mana == 'U') {
-            return this.bluePath
-        }
-        else if (mana == 'G') {
-            return this.greenPath
-        }
-        else if (mana == 'W') {
-            return this.whitePath
-        }
-        else if (mana == 'B') {
-            return this.blackPath
-        }
-        else {
-            return this.circlePath
-        }
-    }
-
-    public greenPath: string = require("../../assets/magic-mana-small/mana_g.png");
-    public redPath: string = require("../../assets/magic-mana-small/mana_r.png");
-    public bluePath: string = require("../../assets/magic-mana-small/mana_u.png");
-    public blackPath: string = require("../../assets/magic-mana-small/mana_b.png");
-    public whitePath: string = require("../../assets/magic-mana-small/mana_w.png");
-    public circlePath: string = require("../../assets/magic-mana-small/mana_circle.png");
 }

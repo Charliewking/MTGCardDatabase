@@ -38,5 +38,6 @@ namespace MTGDatabase.Models
         public string Image_Small { get; set; }
         public string Image_Normal { get; set; }
         public string Image_Large { get; set; }
+        public string Price { get; set; }
     }
 }
