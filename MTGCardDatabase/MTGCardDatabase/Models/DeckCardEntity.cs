@@ -15,9 +15,13 @@ namespace MTGCardDatabase.Models
         }
 
         public DeckCardEntity() { }
+        public string Owner { get; set; }
+        public string DeckName { get; set; }
         public string CardName { get; set; }
         public string CardSet { get; set; }
+        public string Mana_Cost { get; set; }
         public int NumberInDeck { get; set; }
         public int NumberInSideboard { get; set; }
+        public bool CountLimited { get; set; }
     }
 }

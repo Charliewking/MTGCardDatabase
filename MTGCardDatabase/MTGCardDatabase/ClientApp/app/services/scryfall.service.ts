@@ -43,7 +43,8 @@ export class ScryfallService {
                 type_Line: card.type_line,
                 set_Name: card.set_name,
                 full_Cost: [],
-                numberInCollection: 1
+                numberInCollection: 1,
+                price: card.usd
             };
 
             if (cardData.name.includes("//")) {

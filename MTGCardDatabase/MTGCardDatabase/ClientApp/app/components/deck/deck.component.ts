@@ -1,14 +1,15 @@
 import { Component, Inject } from '@angular/core';
 import { DeckService } from '../../services/deck-service'
 import { HttpCardService } from '../../services/http-service'
+import { ScryfallService } from '../../services/scryfall.service';
 import { CardNamePipe } from '../../pipes/card-name.pipe';
 import { CardTextPipe } from '../../pipes/card-text.pipe';
-import { Card, Deck, DeckTrackerRow, Player } from '../../interfaces/interfaces';
+import { Card, Deck, DeckTrackerRow, Player, DeckCard } from '../../interfaces/interfaces';
 
 @Component({
     selector: 'deck',
     templateUrl: './deck.component.html',
-    providers: [DeckService]
+    providers: [DeckService, ScryfallService]
 })
 export class DeckComponent {
     //public forecasts: WeatherForecast[] = [];
@@ -21,12 +22,15 @@ export class DeckComponent {
     public ourCube: Cube = {} as Cube;
     public scope = this;
     public decks: Deck[] = [];
-    public deckCards: Card[] = [];
+    public deckCards: DeckCard[] = [];
     public deckOwner: string = '';
     public deckName: string = '';
 
+    public queryString: string = '';
+
     public _deckService: DeckService;
     public _cardService: HttpCardService;
+    public _scryfallService: ScryfallService;
 
     public players: Player[] = [
         { "name": "Ironstream" },
@@ -40,9 +44,10 @@ export class DeckComponent {
         //this.getDecks("Charlie");
     }
 
-    constructor(private deckService: DeckService, private cardService: HttpCardService) {
+    constructor(private deckService: DeckService, private cardService: HttpCardService, private scryfallService: ScryfallService) {
         this._deckService = deckService;
         this._cardService = cardService;
+        this._scryfallService = scryfallService;
 
         this.ourCube.redCards = 0;
         this.ourCube.blackCards = 0;
@@ -70,31 +75,58 @@ export class DeckComponent {
     getDeckCards(deckName: string) {
         this._deckService.getDeckCards(this.deckOwner + "_" + deckName).subscribe(result => {
             this.deckCards = result.json();
-            //this.getCubeStats();
+            this.deckName = deckName;
         });
     }
 
-    getCubeStats() {
-        for (let card of this.deckCards) {
-            if (card.color1 == "W") {
-                this.ourCube.whiteCards++;
-            }
-            if (card.color1 == "U") {
-                this.ourCube.blueCards++;
-            }
-            if (card.color1 == "B") {
-                this.ourCube.blackCards++;
-            }
-            if (card.color1 == "R") {
-                this.ourCube.redCards++;
-            }
-            if (card.color1 == "G") {
-                this.ourCube.greenCards++;
-            }
-            if (card.type_Line.includes("Land")) {
-                this.ourCube.landCards++;
-            }
+    incrementDeckCard(card: DeckCard) {
+        card.numberInDeck++;
+        this._deckService.incrementDeckCard(card, false);
+    }
+
+    decrementDeckCard(card: DeckCard) {
+        card.numberInDeck--;
+        this._deckService.decrementDeckCard(card, false);
+        if (card.numberInDeck == 0) {
+            this.getDeckCards(card.deckName);
         }
+    }
+
+    addCardToDeck(card: Card) {
+        this._deckService.addCardToDeck(this.deckOwner, this.deckName, card);
+        this.getDeckCards(this.deckName);
+    }
+
+    removeCardFromDeck(card: DeckCard) {
+        this._deckService.removeCardFromDeck(card);
+        this.getDeckCards(card.deckName);
+    }
+
+    getCard(name: string) {
+        this._scryfallService.getCard(name);
+    }
+
+    getCubeStats() {
+        //for (let card of this.deckCards) {
+        //    if (card.color1 == "W") {
+        //        this.ourCube.whiteCards++;
+        //    }
+        //    if (card.color1 == "U") {
+        //        this.ourCube.blueCards++;
+        //    }
+        //    if (card.color1 == "B") {
+        //        this.ourCube.blackCards++;
+        //    }
+        //    if (card.color1 == "R") {
+        //        this.ourCube.redCards++;
+        //    }
+        //    if (card.color1 == "G") {
+        //        this.ourCube.greenCards++;
+        //    }
+        //    if (card.type_Line.includes("Land")) {
+        //        this.ourCube.landCards++;
+        //    }
+        //}
         
     }
 

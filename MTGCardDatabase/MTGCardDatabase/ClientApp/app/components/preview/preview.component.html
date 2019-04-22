@@ -17,7 +17,7 @@
                 <li data-target="#myCarousel" *ngFor="let x of cards;let i = index" [attr.data-slide-to]="i" ngClass="i == 0 ? 'active' : ''"></li>
             </ol>-->
             <!-- Wrapper for slides -->
-            <div *ngIf="scryfallService.returnCards[0]" class="carousel-inner" role="listbox">
+            <div *ngIf="_scryfallService.returnCards[0]" class="carousel-inner" role="listbox">
                 <div class="row">
                     <div class="col-md-6">
                         <h1 style="color:white;margin-left:45px;margin-top:65%;margin-bottom:5%">

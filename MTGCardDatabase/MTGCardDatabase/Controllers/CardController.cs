@@ -48,7 +48,7 @@ namespace MTGDatabase.Controllers
 
             //var returnValue = await table.ExecuteQuerySegmentedAsync(query, token);
 
-            var returnValue = await table.ExecuteQuerySegmentedAsync(new TableQuery<CardEntity>(), token);
+            var returnValue = await table.ExecuteQuerySegmentedAsync(new TableQuery<CardEntity>().Take(20), token);
 
             return Ok(returnValue.ToList());
         }

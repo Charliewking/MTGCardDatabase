@@ -31,11 +31,11 @@ export class PreviewComponent {
 
     ngOnInit() {
         // call some function that gets either a cache or new cards if no cache
-        this.scryfallService.getCard("Nicol Bolas, Dragon God");
+        // this._scryfallService.getCard("Nicol Bolas, Dragon God");
     }
 
     getCard(name: string) {
-        this.scryfallService.getCard(name);
+        this._scryfallService.getCard(name);
     }
 
     setMPScore() {

@@ -9,6 +9,7 @@ import { DeckService } from './services/deck-service';
 
 import { AppComponent } from './components/app/app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
+import { ManaCostComponent } from './components/manacost/manacost.component';
 import { CollectionComponent } from './components/collection/collection.component';
 import { DeckComponent } from './components/deck/deck.component';
 import { SearchCardsComponent } from './components/searchcards/searchcards.component';
@@ -21,6 +22,7 @@ import { CardRarityPipe } from './pipes/card-rarity.pipe';
     declarations: [
         AppComponent,
         NavMenuComponent,
+        ManaCostComponent,
         SearchCardsComponent,
         DeckComponent,
         CollectionComponent,
