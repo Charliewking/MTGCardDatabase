@@ -79,7 +79,7 @@
 
 
     <div class="row">
-        <div class="col-sm-3" *ngFor="let card of _httpCardService.cards | cardRarityFilter: rarityString | cardTextFilter: queryString; let i = index">
+        <div class="col-sm-3 col-md-3 col-lg-2" *ngFor="let card of _httpCardService.cards | cardRarityFilter: rarityString | cardTextFilter: queryString; let i = index">
             <div class="card" style="width: 18rem;margin:5%;">
                 <img class="card-img-top" src={{card.image_Normal}} alt="Card image cap">
                 <div class="card-body">

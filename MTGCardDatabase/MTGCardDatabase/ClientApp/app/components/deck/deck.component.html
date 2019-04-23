@@ -60,7 +60,7 @@
 <hr style="margin-top:10px;margin-bottom:10px;" />
 
 <div class="row">
-    <div class="col-sm-6"  *ngIf="deckCards">
+    <div class="col-sm-6"  *ngIf="selectedDeck.name != ' '">
         <input type="text" (keyup.enter)="getCard(setQuery)" [(ngModel)]="setQuery" id="search" placeholder="Search for a Card">
         <button (click)="getCard(setQuery)" class="btn">Search Cards</button>
         <div class="row" style="margin-top:15px;" *ngFor="let card of scryfallService.returnCards | cardNameFilter: queryString">
@@ -86,6 +86,14 @@
         </div>
     </div>
     <div class="col-sm-6">
+        <div class="row" *ngIf="selectedDeck.name != ' '">
+            <div class="col-md-2">
+                {{selectedDeck.name}}
+            </div>
+            <div class="col-md-2">
+                {{selectedDeck.cardCount}}/60 cards
+            </div>
+        </div>
         <table class='table' *ngIf="deckCards[0]">
             <thead>
                 <tr>

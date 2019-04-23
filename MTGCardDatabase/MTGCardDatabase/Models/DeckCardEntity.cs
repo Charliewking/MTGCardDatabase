@@ -20,6 +20,12 @@ namespace MTGCardDatabase.Models
         public string CardName { get; set; }
         public string CardSet { get; set; }
         public string Mana_Cost { get; set; }
+        public string Type_Line { get; set; }
+        public string Color1 { get; set; }
+        public string Color2 { get; set; }
+        public string Color3 { get; set; }
+        public string Color4 { get; set; }
+        public string Color5 { get; set; }
         public int NumberInDeck { get; set; }
         public int NumberInSideboard { get; set; }
         public bool CountLimited { get; set; }

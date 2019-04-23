@@ -25,6 +25,7 @@ export class DeckComponent {
     public deckCards: DeckCard[] = [];
     public deckOwner: string = '';
     public deckName: string = '';
+    public selectedDeck: Deck = {} as Deck;
 
     public queryString: string = '';
 
@@ -57,9 +58,11 @@ export class DeckComponent {
         this.ourCube.artifactCards = 0;
         this.ourCube.landCards = 0;
 
+        this.selectedDeck.name = " ";
     }
 
     getDecks(owner: string) {
+        this.deckCards = [];
         this._deckService.getDecks(owner);
     }
 
@@ -76,6 +79,15 @@ export class DeckComponent {
         this._deckService.getDeckCards(this.deckOwner + "_" + deckName).subscribe(result => {
             this.deckCards = result.json();
             this.deckName = deckName;
+            this.getDeckDetails(this.deckOwner, deckName);
+        });
+    }
+
+    getDeckDetails(deckOwner: string, deckName: string) {
+
+        this._deckService.getDeckDetails(deckOwner, deckName).subscribe(result => {
+            var returnObject: any = result.json();
+            this.selectedDeck = returnObject[0];
         });
     }
 

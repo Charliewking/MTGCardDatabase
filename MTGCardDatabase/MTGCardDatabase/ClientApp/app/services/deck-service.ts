@@ -18,6 +18,10 @@ export class DeckService {
         });
     }
 
+    getDeckDetails(deckOwner: string, deckName: string) {
+        return this.http.get(this._baseUrl + 'api/decks/deck/' + deckOwner + '/' + deckName)
+    }
+
     addDeck(_ownerName: string, _name: string) {
 
         var newDeck = {
@@ -44,7 +48,13 @@ export class DeckService {
             CardName: card.name,
             CardSet: card.set_Short,
             Mana_Cost: card.mana_Cost,
-            NumberInDeck: 1
+            NumberInDeck: 1,
+            Color1: card.color1,
+            Color2: card.color2,
+            Color3: card.color3,
+            Color4: card.color4,
+            Color5: card.color5,
+            Type_Line: card.type_Line
         }
 
         return this.http.post(this._baseUrl + 'api/deckcards/addcardtodeck', deckCard)

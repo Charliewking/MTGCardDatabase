@@ -34,17 +34,29 @@ namespace MTGDatabase.Controllers
         [Route("{PlayerName}")]
         public async Task<IActionResult> GetAllDecks([FromRoute] string PlayerName)
         {
-            CloudStorageAccount account = GetStorageAccount();
-
-            CloudTableClient client = account.CreateCloudTableClient();
-
-            CloudTable table = client.GetTableReference("deck");
-
             TableQuery<DeckEntity> query = new TableQuery<DeckEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, PlayerName));
 
-            var returnValue = await table.ExecuteQuerySegmentedAsync(query, token);
+            var returnValue = await GetStorageTable(_config.deckTableName).ExecuteQuerySegmentedAsync(query, token);
 
             return Ok(returnValue.ToList());
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(typeof(string), 400)]
+        [ProducesResponseType(typeof(string), 500)]
+        [Route("deck/{PlayerName}/{DeckName}")]
+        public async Task<IActionResult> GetAllDecks([FromRoute] string playerName, string deckName)
+        {
+            TableQuery<DeckEntity> finalQuery = new TableQuery<DeckEntity>().Where(
+                TableQuery.CombineFilters(
+                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, playerName),
+                    TableOperators.And,
+                    TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, deckName)));
+
+            var returnValue = await GetStorageTable(_config.deckTableName).ExecuteQuerySegmentedAsync(finalQuery, token);
+
+            return Ok(returnValue);
         }
 
         [HttpPost]
@@ -58,7 +70,6 @@ namespace MTGDatabase.Controllers
             newDeck.Name = deck.Name;
 
             await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Insert(newDeck));
-            await GetStorageTable(_config.cubeStats).ExecuteAsync(TableOperation.Retrieve<DeckStatsEntity>("Stats", deck.PartitionKey)).ConfigureAwait(true);
         }
 
         [HttpPost]
