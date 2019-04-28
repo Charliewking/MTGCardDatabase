@@ -7,58 +7,99 @@ export class DeckService {
 
     private _baseUrl = '';
     public decks: Deck[] = [];
+    public deckCards: DeckCard[] = [];
+    public deckOwner: string = '';
+    public deckName: string = '';
+    public deckConstructed: boolean = true;
+    public selectedDeck: Deck = {} as Deck;
+    public successText: string = '';
+
+    public queryString: string = '';
 
     constructor(private http: Http, @Inject('BASE_URL') baseUrl: string) {
         this._baseUrl = baseUrl;
+        this.selectedDeck.name = ' ';
     }
 
     getDecks(owner: string) {
+        this.deckCards = [];
         return this.http.get(this._baseUrl + 'api/decks/' + owner).subscribe(result => {
             this.decks = result.json();
         });
     }
 
     getDeckDetails(deckOwner: string, deckName: string) {
-        return this.http.get(this._baseUrl + 'api/decks/deck/' + deckOwner + '/' + deckName)
+        this.http.get(this._baseUrl + 'api/decks/deck/' + deckOwner + '/' + deckName).subscribe(result => {
+            var returnObject: any = result.json();
+            this.selectedDeck = returnObject[0];
+        }, error => {
+            alert(error.json());
+        });
+
+        return this.selectedDeck;
     }
 
-    addDeck(_ownerName: string, _name: string) {
+    getDeckCards() {
+        this.http.get(this._baseUrl + 'api/decks/cards/' + this.selectedDeck.owner + '_' + this.selectedDeck.name).subscribe(result => {
+            this.successText = "Card Retrieved Successfully";
+            this.deckCards = result.json();
+            this.deckOwner = this.selectedDeck.owner;
+            this.deckName = this.selectedDeck.name;
+            this.getDeckDetails(this.deckOwner, this.deckName);
+        }, error => {
+            alert(error.json());
+        });
+    }
 
-        var newDeck = {
-            PartitionKey: _ownerName,
-            RowKey: _name,
-            name: _name
-        };
+    addDeck(deck: Deck) {
 
-        return this.http.post(this._baseUrl + 'api/decks/addDeck', newDeck)
+        return this.http.post(this._baseUrl + 'api/decks/addDeck', deck)
             .subscribe(data => { }, error => {
                 alert(error.json());
             },
-            () => {
-                this.getDecks(_ownerName);
-            }
-        );
+                () => {
+                    this.getDecks(deck.owner);
+                }
+            );
     }
 
-    addCardToDeck(deckOwner: string, deckName: string, card: Card) {
+    removeDeck(deck: Deck) {
+        return this.http.post(this._baseUrl + 'api/deckCards/removeDeck', deck)
+            .subscribe(() => {
+                this.http.post(this._baseUrl + 'api/decks/removeDeck', deck)
+                    .subscribe(() => {
+                        this.getDecks(deck.owner);
+                    }, error => {
+                        alert(error.json());
+                    });
+            }, error => {
+                alert(error.json());
+            });
+    }
 
-        var deckCard = {
-            Owner: deckOwner,
-            DeckName: deckName,
-            CardName: card.name,
-            CardSet: card.set_Short,
-            Mana_Cost: card.mana_Cost,
-            NumberInDeck: 1,
-            Color1: card.color1,
-            Color2: card.color2,
-            Color3: card.color3,
-            Color4: card.color4,
-            Color5: card.color5,
-            Type_Line: card.type_Line
-        }
+    addCardToDeck(card: Card) {
 
-        return this.http.post(this._baseUrl + 'api/deckcards/addcardtodeck', deckCard)
-            .subscribe(data => { }, error => {
+        var deckCard = this.createDeckCard(card);
+        deckCard.numberInDeck = 1;
+
+        this.http.post(this._baseUrl + 'api/deckcards/addcardtodeck/' + this.selectedDeck.constructed, deckCard)
+            .subscribe(() => {
+                this.successText = "Card Added Successfully";
+                this.getDeckCards();
+            }, error => {
+                alert(error.json());
+            });
+    }
+
+    addCardToSideboard(card: Card) {
+
+        var deckCard = this.createDeckCard(card);
+        deckCard.numberInSideboard = 1;
+        this.http.post(this._baseUrl + 'api/deckcards/addcardtosideboard/' + this.selectedDeck.constructed, deckCard)
+            .subscribe(() => {
+                this.successText = "Card Added Successfully";
+                this.getDeckCards();
+            }, error => {
                 alert(error.json());
             });
     }
@@ -102,10 +143,6 @@ export class DeckService {
         }
     }
 
-    getDeckCards(playerDeck: string) {
-        return this.http.get(this._baseUrl + 'api/decks/cards/' + playerDeck);
-    }
-
     addDeckTrackerRow(deckTrackerRow: DeckTrackerRow) {
         return this.http.post(this._baseUrl + 'api/decks/deckTracker', deckTrackerRow)
             .subscribe(data => { }, error => {
@@ -115,6 +152,38 @@ export class DeckService {
 
     getDeckTrackerRows(deck: Deck) {
         return this.http.get(this._baseUrl + 'api/decks/deckTracker' + deck);
+    }
+
+    createDeckCard(card: Card) {
+
+        let deckCard = {
+            owner: this.selectedDeck.owner,
+            deckName: this.selectedDeck.name,
+            cardName: card.name,
+            cardSet: card.set_Short,
+            mana_Cost: card.mana_Cost,
+            color1: card.color1,
+            color2: card.color2,
+            color3: card.color3,
+            color4: card.color4,
+            color5: card.color5,
+            type_Line: card.type_Line,
+            power: card.power,
+            toughness: card.toughness,
+            loyalty: card.loyalty,
+            card_Text: card.card_Text,
+            flavor_Text: card.flavor_Text,
+            numberInCollection: card.numberInCollection,
+            cmc: card.cmc,
+            set_Name: card.set_Name,
+            full_Cost: card.full_Cost,
+            image_Small: card.image_Small,
+            image_Normal: card.image_Normal,
+            image_Large: card.image_Large,
+            price: card.price
+        } as DeckCard;
+
+        return deckCard;
     }
 
 }

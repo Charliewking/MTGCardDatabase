@@ -16,7 +16,7 @@ namespace MTGCardDatabase.Controllers
     public class CardDeckController : Controller
     {
         private readonly WebConfiguration _config;
-        private readonly string DeckCardTable = "deckcard";
+        private readonly TableContinuationToken token = null;
 
         public IActionResult Index()
         {
@@ -35,22 +35,29 @@ namespace MTGCardDatabase.Controllers
         [Route("{Player_Deck}")]
         public async Task<IActionResult> GetAllDeckCards([FromRoute] string Player_Deck)
         {
-            CloudTable table = GetStorageTable(DeckCardTable);
-            TableContinuationToken token = null;
-
             TableQuery<DeckCardEntity> query = new TableQuery<DeckCardEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Player_Deck));
 
-            var returnValue = await table.ExecuteQuerySegmentedAsync(query, token);
+            var returnValue = await GetStorageTable(_config.deckCardTableName).ExecuteQuerySegmentedAsync(query, token);
 
             return Ok(returnValue.ToList());
         }
 
-        [Route("addCardToDeck")]
-        public async Task AddCardToDeck([FromBody]DeckCardEntity deckCard)
+        [Route("addCardToDeck/{format}")]
+        public async Task AddCardToDeck([FromBody]DeckCardEntity deckCard,[FromRoute]bool format)
         {
-            //await UpdateCubeStats(deckCard);
+            deckCard = isCountLimited(deckCard, format);
 
-            deckCard = isCountLimited(deckCard);
+            deckCard.PartitionKey = deckCard.Owner + "_" + deckCard.DeckName;
+            deckCard.RowKey = deckCard.CardName.Replace(" // ", " ");
+
+            await GetStorageTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Insert(deckCard));
+            await UpdateDeckStats(deckCard, true);
+        }
+
+        [Route("addcardtosideboard/{format}")]
+        public async Task AddCardToSideboard([FromBody]DeckCardEntity deckCard, [FromRoute]bool format)
+        {
+            deckCard = isCountLimited(deckCard, format);
 
             deckCard.PartitionKey = deckCard.Owner + "_" + deckCard.DeckName;
             deckCard.RowKey = deckCard.CardName.Replace(" // ", " ");
@@ -135,6 +142,28 @@ namespace MTGCardDatabase.Controllers
             {
                 await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Delete(deleteCard));
                 await UpdateDeckStats(deleteCard, false);
+            }
+        }
+
+        [Route("removeDeck")]
+        public async Task RemoveDeck([FromBody]DeckEntity Deck)
+        {
+            string playerDeck = Deck.Owner + "_" + Deck.Name;
+
+            //OkObjectResult cardsResult = (OkObjectResult)GetAllDeckCards(playerDeck).Result;
+
+            //List<DeckCardEntity> deckCards = (List<DeckCardEntity>)cardsResult.Value;
+
+            List<DeckCardEntity> deckCards = (List<DeckCardEntity>)((OkObjectResult)GetAllDeckCards(playerDeck).Result).Value;
+
+            foreach (DeckCardEntity Card in deckCards)
+            {
+                DeckCardEntity deleteCard = await RetrieveDeckCard(Card, _config.deckCardTableName);
+                if (deleteCard != null)
+                {
+                    await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Delete(deleteCard));
+                    await UpdateDeckStats(deleteCard, false);
+                }
             }
         }
 
@@ -262,9 +291,9 @@ namespace MTGCardDatabase.Controllers
             return (CloudStorageAccount.Parse(_config.mtgdatabaseConnectionString)).CreateCloudTableClient().GetTableReference(tableName);
         }
 
-        private DeckCardEntity isCountLimited(DeckCardEntity deckCard)
+        private DeckCardEntity isCountLimited(DeckCardEntity deckCard, bool format)
         {
-            if(deckCard.CardName == "Mountain" || deckCard.CardName == "Plains" || deckCard.CardName == "Swamp" || deckCard.CardName == "Forest" || deckCard.CardName == "Island" || deckCard.CardName == "Rat Colony" || deckCard.CardName == "Persistent Petitioners")
+            if(!format || deckCard.CardName == "Mountain" || deckCard.CardName == "Plains" || deckCard.CardName == "Swamp" || deckCard.CardName == "Forest" || deckCard.CardName == "Island" || deckCard.CardName == "Rat Colony" || deckCard.CardName == "Persistent Petitioners")
             {
                 deckCard.CountLimited = false;
             }

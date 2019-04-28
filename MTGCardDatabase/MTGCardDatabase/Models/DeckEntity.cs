@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
+using MTGCardDatabase.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,8 @@ namespace MTGDatabase.Models
         public DeckEntity() { }
         public string Name { get; set; }
         public string Owner { get; set; }
-        public CardEntity[] MainDeck { get; set; }
-        public CardEntity[] Sideboard { get; set; }
+        public DeckCardEntity[] MainDeck { get; set; }
+        public DeckCardEntity[] Sideboard { get; set; }
         public bool Constructed { get; set; }
         public string Color1 { get; set; }
         public string Color2 { get; set; }

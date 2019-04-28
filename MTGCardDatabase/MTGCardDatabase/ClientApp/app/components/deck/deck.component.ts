@@ -1,9 +1,7 @@
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { DeckService } from '../../services/deck-service'
 import { HttpCardService } from '../../services/http-service'
 import { ScryfallService } from '../../services/scryfall.service';
-import { CardNamePipe } from '../../pipes/card-name.pipe';
-import { CardTextPipe } from '../../pipes/card-text.pipe';
 import { Card, Deck, DeckTrackerRow, Player, DeckCard } from '../../interfaces/interfaces';
 
 @Component({
@@ -25,7 +23,8 @@ export class DeckComponent {
     public deckCards: DeckCard[] = [];
     public deckOwner: string = '';
     public deckName: string = '';
-    public selectedDeck: Deck = {} as Deck;
+    public deckConstructed: boolean = true;
+    public addResult: string = '';
 
     public queryString: string = '';
 
@@ -58,7 +57,7 @@ export class DeckComponent {
         this.ourCube.artifactCards = 0;
         this.ourCube.landCards = 0;
 
-        this.selectedDeck.name = " ";
+        this._deckService.selectedDeck.name = " ";
     }
 
     getDecks(owner: string) {
@@ -67,28 +66,47 @@ export class DeckComponent {
     }
 
     createNewDeck() {
-        this.newDeck(this.deckOwner, this.deckName);
+        this.newDeck(this.deckOwner, this.deckName, this.deckConstructed);
         this.deckName = '';
     }
 
-    newDeck(owner: string, name: string) {
-        this._deckService.addDeck(owner, name);
+    newDeck(deckOwner: string, deckName: string, deckConstructed: boolean) {
+        let deck: Deck = {
+            owner: deckOwner,
+            name: deckName,
+            constructed: deckConstructed,
+            color1: "",
+            color2: "",
+            color3: "",
+            color4: "",
+            color5: "",
+            mainDeck: [],
+            sideBoard: [],
+            landCards: 0,
+            creatureCount: 0,
+            sorceryCount: 0,
+            instantCount: 0,
+            enchantmentCount: 0
+        }
+
+        this._deckService.addDeck(deck);
     }
 
-    getDeckCards(deckName: string) {
-        this._deckService.getDeckCards(this.deckOwner + "_" + deckName).subscribe(result => {
-            this.deckCards = result.json();
-            this.deckName = deckName;
-            this.getDeckDetails(this.deckOwner, deckName);
-        });
+    removeDeck(deck: Deck) {
+        this._deckService.removeDeck(deck);
+    }
+
+    setSelectedDeck(deck: Deck) {
+        this._deckService.selectedDeck = deck;
+        this.getDeckCards();
+    }
+
+    getDeckCards() {
+        this._deckService.getDeckCards();
     }
 
     getDeckDetails(deckOwner: string, deckName: string) {
-
-        this._deckService.getDeckDetails(deckOwner, deckName).subscribe(result => {
-            var returnObject: any = result.json();
-            this.selectedDeck = returnObject[0];
-        });
+        this._deckService.getDeckDetails(deckOwner, deckName);
     }
 
     incrementDeckCard(card: DeckCard) {
@@ -100,22 +118,29 @@ export class DeckComponent {
         card.numberInDeck--;
         this._deckService.decrementDeckCard(card, false);
         if (card.numberInDeck == 0) {
-            this.getDeckCards(card.deckName);
+            this.getDeckCards();
         }
     }
 
     addCardToDeck(card: Card) {
-        this._deckService.addCardToDeck(this.deckOwner, this.deckName, card);
-        this.getDeckCards(this.deckName);
+        this._deckService.addCardToDeck(card);
+    }
+
+    addCardToSideBoard(card: Card) {
+        this._deckService.addCardToSideboard(card);
     }
 
     removeCardFromDeck(card: DeckCard) {
         this._deckService.removeCardFromDeck(card);
-        this.getDeckCards(card.deckName);
+        this.getDeckCards();
     }
 
     getCard(name: string) {
         this._scryfallService.getCard(name);
+    }
+
+    setSearchQuery(cardName: string) {
+        this.getCard(cardName);
     }
 
     getCubeStats() {

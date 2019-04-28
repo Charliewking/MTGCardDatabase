@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using MTGCardDatabase.Controllers;
 using MTGCardDatabase.Models;
 using MTGDatabase.Models;
 
@@ -34,9 +35,32 @@ namespace MTGDatabase.Controllers
         [Route("{PlayerName}")]
         public async Task<IActionResult> GetAllDecks([FromRoute] string PlayerName)
         {
+            //List<DeckEntity> returnDecks = new List<DeckEntity>();
+
             TableQuery<DeckEntity> query = new TableQuery<DeckEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, PlayerName));
 
             var returnValue = await GetStorageTable(_config.deckTableName).ExecuteQuerySegmentedAsync(query, token);
+
+            //foreach(DeckEntity deck in returnValue.ToList())
+            //{
+            //    TableQuery<DeckCardEntity> deckCardquery = new TableQuery<DeckCardEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Player_Deck));
+
+            //    var deckCards = await GetStorageTable(_config.deckCardTableName).ExecuteQuerySegmentedAsync(deckCardquery, token);
+
+            //    foreach (DeckCardEntity deckCard in deckCards.ToList())
+            //    {
+            //        if (deckCard.NumberInDeck > 1)
+            //        {
+            //            deck.MainDeck.Append(deckCard)
+            //        }
+            //        else
+            //        {
+            //            deck.Sideboard.Append(deckCard);
+            //        }
+            //    }
+
+            //    if(deckCard)
+            //}
 
             return Ok(returnValue.ToList());
         }
@@ -66,21 +90,21 @@ namespace MTGDatabase.Controllers
         [Route("addDeck")]
         public async Task AddNewDeck([FromBody]DeckEntity deck)
         {
-            DeckEntity newDeck = new DeckEntity(deck.PartitionKey, deck.RowKey);
-            newDeck.Name = deck.Name;
+            deck.PartitionKey = deck.Owner;
+            deck.RowKey = deck.Name;
 
-            await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Insert(newDeck));
+            await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Insert(deck));
         }
 
         [HttpPost]
         [Route("RemoveDeck")]
         public async Task RemoveDeck([FromBody]DeckEntity deck)
         {
-            await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Delete(deck));
-
-            TableResult result = await GetStorageTable(_config.cubeStats).ExecuteAsync(TableOperation.Retrieve<DeckStatsEntity>("Stats", deck.PartitionKey)).ConfigureAwait(true);
-            DeckStatsEntity deckStatsRow = (DeckStatsEntity)result.Result;
-            await GetStorageTable(_config.cubeStats).ExecuteAsync(TableOperation.Delete(deckStatsRow));
+            //await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Delete(deck));
+            await RemoveDeckTrackerRow(deck);
+            TableResult result = await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Retrieve<DeckEntity>(deck.Owner, deck.Name)).ConfigureAwait(true);
+            DeckEntity removeDeck = (DeckEntity)result.Result;
+            await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Delete(removeDeck));
         }
 
         [HttpGet]
@@ -125,9 +149,23 @@ namespace MTGDatabase.Controllers
             await table.ExecuteAsync(TableOperation.Insert(deckTrackerEntry));
         }
 
+        private async Task RemoveDeckTrackerRow(DeckEntity deck)
+        {
+            CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(_config.deckTrackerTableName);
+            TableQuery<DeckEntity> query = new TableQuery<DeckEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, deck.Name));
+
+            var returnValue = await table.ExecuteQuerySegmentedAsync(query, token);
+
+            var deleteList = returnValue.ToList();
+            foreach(DeckEntity deleteDeck in deleteList)
+            {
+                await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Delete(deleteDeck));
+            }
+        }
+
         [HttpGet]
         [Route("deckTracker")]
-        public async Task<IActionResult> AddDeckTrackerRow([FromRoute] DeckEntity deck)
+        public async Task<IActionResult> GetDeckTrackerRow([FromRoute] DeckEntity deck)
         {
             CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(_config.deckTrackerTableName);
             TableQuery<DeckEntity> query = new TableQuery<DeckEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, deck.Name));

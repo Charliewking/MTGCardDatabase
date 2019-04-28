@@ -75,6 +75,12 @@ interface Deck {
     mainDeck: DeckCard[];
     sideBoard: DeckCard[];
     constructed: boolean;
+    landCards: number;
+    creatureCount: number;
+    sorceryCount: number;
+    instantCount: number;
+    enchantmentCount: number;
+
 }
 
 interface DeckCard {
@@ -92,6 +98,19 @@ interface DeckCard {
     color4: string;
     color5: string;
     type_Line: string;
+    power: string;
+    toughness: string;
+    loyalty: string;
+    card_Text: string;
+    flavor_Text: string;
+    numberInCollection: number;
+    cmc: string;
+    set_Name: string;
+    full_Cost: string[];
+    image_Small: any;
+    image_Normal: any;
+    image_Large: any;
+    price: string;
 }
 
 interface Player {

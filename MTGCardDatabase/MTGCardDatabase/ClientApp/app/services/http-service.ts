@@ -75,26 +75,3 @@ export class HttpCardService {
     }
 
 }
-
-//interface Card {
-//    PartitionKey: string;
-//    RowKey: string;
-//    name: string;
-//    set: string;
-//    colors: string[];
-//    rarity: string;
-//    mana_cost: string;
-//    added: boolean;
-//    power: string;
-//    type_line: string;
-//    color_identity: string;
-//    toughness: string;
-//    image_small: string;
-//    card_text: string;
-//    flavor_text: string;
-//    numberInCollection: number;
-//    cmc: string;
-//    image_uris: any;
-//    set_name: string;
-//    oracle_text: string;
-//}

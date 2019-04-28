@@ -17,6 +17,7 @@ import { PreviewComponent } from './components/preview/preview.component';
 import { CardNamePipe } from './pipes/card-name.pipe';
 import { CardTextPipe } from './pipes/card-text.pipe';
 import { CardRarityPipe } from './pipes/card-rarity.pipe';
+import { CMCSortPipe } from './pipes/card-cmc.pipe';
 
 @NgModule({
     declarations: [
@@ -29,7 +30,8 @@ import { CardRarityPipe } from './pipes/card-rarity.pipe';
         PreviewComponent,
         CardNamePipe,
         CardTextPipe,
-        CardRarityPipe
+        CardRarityPipe,
+        CMCSortPipe
     ],
     imports: [
         CommonModule,
