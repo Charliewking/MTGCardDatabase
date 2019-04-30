@@ -125,7 +125,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let card of _deckService.deckCards | cardNameFilter: queryString | cardTextFilter: cardTextString | cmcsort; let i = index">
+                <tr *ngFor="let card of _deckService.selectedDeck.mainDeck | cardNameFilter: queryString | cardTextFilter: cardTextString | cmcsort; let i = index">
                     <td>
                         <div class="row">
                             <a class="btn btn-sm" (click)="incrementDeckCard(card)"><i class="glyphicon-plus"></i></a>
@@ -161,7 +161,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let card of _deckService.deckCards | cardNameFilter: queryString | cardTextFilter: cardTextString | cmcsort; let i = index">
+                <tr *ngFor="let card of _deckService.selectedDeck.sideboard | cardNameFilter: queryString | cardTextFilter: cardTextString | cmcsort; let i = index">
                     <td>
                         <div class="row">
                             <a class="btn btn-sm" (click)="incrementDeckCard(card)"><i class="glyphicon-plus"></i></a>

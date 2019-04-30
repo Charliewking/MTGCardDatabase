@@ -81,7 +81,7 @@ export class DeckComponent {
             color4: "",
             color5: "",
             mainDeck: [],
-            sideBoard: [],
+            sideboard: [],
             landCards: 0,
             creatureCount: 0,
             sorceryCount: 0,
@@ -126,7 +126,7 @@ export class DeckComponent {
         this._deckService.addCardToDeck(card);
     }
 
-    addCardToSideBoard(card: Card) {
+    addCardToSideboard(card: Card) {
         this._deckService.addCardToSideboard(card);
     }
 

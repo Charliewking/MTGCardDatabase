@@ -73,7 +73,7 @@ interface Deck {
     color4: string;
     color5: string;
     mainDeck: DeckCard[];
-    sideBoard: DeckCard[];
+    sideboard: DeckCard[];
     constructed: boolean;
     landCards: number;
     creatureCount: number;

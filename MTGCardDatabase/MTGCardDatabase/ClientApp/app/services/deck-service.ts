@@ -111,9 +111,9 @@ export class DeckService {
             });
     }
 
-    incrementDeckCard(card: DeckCard, sideBoard: boolean) {
+    incrementDeckCard(card: DeckCard, sideboard: boolean) {
 
-        if (sideBoard) {
+        if (sideboard) {
             return this.http.post(this._baseUrl + 'api/deckcards/incrementSideboard', card)
                 .subscribe(data => { }, error => {
                     alert(error.json());
@@ -127,9 +127,9 @@ export class DeckService {
         }
     }
 
-    decrementDeckCard(card: DeckCard, sideBoard: boolean) {
+    decrementDeckCard(card: DeckCard, sideboard: boolean) {
 
-        if (sideBoard) {
+        if (sideboard) {
             return this.http.post(this._baseUrl + 'api/deckcards/decrementSideboard', card)
                 .subscribe(data => { }, error => {
                     alert(error.json());
