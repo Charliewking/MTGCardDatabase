@@ -7,6 +7,7 @@ export class HttpCardService {
 
     private _baseUrl = '';
     public cards: Card[] = [];
+    public collectionValue: string = '';
 
     constructor(private http: Http, @Inject('BASE_URL') baseUrl: string) {
         this._baseUrl = baseUrl;
@@ -74,4 +75,7 @@ export class HttpCardService {
             });
     }
 
+    getCollectionValue() {
+        return this.http.get(this._baseUrl + 'api/cards/value');
+    }
 }

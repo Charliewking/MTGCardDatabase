@@ -41,26 +41,32 @@ namespace MTGDatabase.Controllers
 
             var returnValue = await GetStorageTable(_config.deckTableName).ExecuteQuerySegmentedAsync(query, token);
 
-            //foreach(DeckEntity deck in returnValue.ToList())
-            //{
-            //    TableQuery<DeckCardEntity> deckCardquery = new TableQuery<DeckCardEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Player_Deck));
+            foreach (DeckEntity deck in returnValue.ToList())
+            {
+                string Player_Deck = PlayerName + "_" + deck.Name;
 
-            //    var deckCards = await GetStorageTable(_config.deckCardTableName).ExecuteQuerySegmentedAsync(deckCardquery, token);
+                TableQuery<DeckCardEntity> deckCardquery = new TableQuery<DeckCardEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Player_Deck));
 
-            //    foreach (DeckCardEntity deckCard in deckCards.ToList())
-            //    {
-            //        if (deckCard.NumberInDeck > 1)
-            //        {
-            //            deck.MainDeck.Append(deckCard)
-            //        }
-            //        else
-            //        {
-            //            deck.Sideboard.Append(deckCard);
-            //        }
-            //    }
+                var deckCards = await GetStorageTable(_config.deckCardTableName).ExecuteQuerySegmentedAsync(deckCardquery, token);
 
-            //    if(deckCard)
-            //}
+                List<DeckCardEntity> MainDeckTempList = new List<DeckCardEntity>();
+                List<DeckCardEntity> SideboardTempList = new List<DeckCardEntity>();
+
+                foreach (DeckCardEntity deckCard in deckCards.Results)
+                {
+                    if (deckCard.NumberInDeck > 1)
+                    {
+                        MainDeckTempList.Add(deckCard);
+                    }
+                    else
+                    {
+                        SideboardTempList.Add(deckCard);
+                    }
+                }
+
+                deck.MainDeck = MainDeckTempList;
+                deck.Sideboard = SideboardTempList;
+            }
 
             return Ok(returnValue.ToList());
         }

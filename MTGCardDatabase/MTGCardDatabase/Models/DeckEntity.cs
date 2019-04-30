@@ -18,8 +18,8 @@ namespace MTGDatabase.Models
         public DeckEntity() { }
         public string Name { get; set; }
         public string Owner { get; set; }
-        public DeckCardEntity[] MainDeck { get; set; }
-        public DeckCardEntity[] Sideboard { get; set; }
+        public List<DeckCardEntity> MainDeck { get; set; }
+        public List<DeckCardEntity> Sideboard { get; set; }
         public bool Constructed { get; set; }
         public string Color1 { get; set; }
         public string Color2 { get; set; }
