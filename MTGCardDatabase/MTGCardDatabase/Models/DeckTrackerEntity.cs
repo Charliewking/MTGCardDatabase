@@ -13,6 +13,9 @@ namespace MTGCardDatabase.Models
             this.PartitionKey = owner_Deck;
             this.RowKey = new DateTime().ToString();
         }
+        public DeckTrackerEntity() { }
+        public string Owner { get; set; }
+        public string DeckName { get; set; }
         public string PlayedAgainst { get; set; }
         public string Format { get; set; }
         public string Result { get; set; }

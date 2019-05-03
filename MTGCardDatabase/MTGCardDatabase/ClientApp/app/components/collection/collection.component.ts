@@ -16,6 +16,7 @@ export class CollectionComponent {
 
     public rarityString: string = '';
     public queryString: string = '';
+    public collectionValue: string = '';
 
     public filterString: string = '';
 
@@ -31,7 +32,9 @@ export class CollectionComponent {
     ngOnInit() {
         // call some function that gets either a cache or new cards if no cache
         this._httpCardService.getCards();
-        //this.getCards();
+        this._httpCardService.getCollectionValue().subscribe(result => {
+            this.collectionValue = result.json();
+        });
     }
 
     constructor(private httpCardService: HttpCardService, private deckService: DeckService) {

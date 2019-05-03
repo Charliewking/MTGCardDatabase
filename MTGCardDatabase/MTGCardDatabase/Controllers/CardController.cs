@@ -17,6 +17,7 @@ namespace MTGDatabase.Controllers
     public class CardController : Controller
     {
         private readonly WebConfiguration _config;
+        private readonly TableContinuationToken token = null;
         //private TableStorageUtility _utility;
 
         public IActionResult Index()
@@ -37,18 +38,7 @@ namespace MTGDatabase.Controllers
         [Route("")]
         public async Task<IActionResult> GetAllCards()
         {
-            CloudStorageAccount account = GetStorageAccount();
-
-            CloudTableClient client = account.CreateCloudTableClient();
-
-            CloudTable table = client.GetTableReference(_config.cardTableName);
-            TableContinuationToken token = null;
-
-            //TableQuery<CardEntity> query = new TableQuery<CardEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "RNA"));
-
-            //var returnValue = await table.ExecuteQuerySegmentedAsync(query, token);
-
-            var returnValue = await table.ExecuteQuerySegmentedAsync(new TableQuery<CardEntity>().Take(20), token);
+            var returnValue = await GetCloudTable(_config.cardTableName).ExecuteQuerySegmentedAsync(new TableQuery<CardEntity>().Take(20), token);
 
             return Ok(returnValue.ToList());
         }
@@ -60,21 +50,28 @@ namespace MTGDatabase.Controllers
         [Route("{filter}")]
         public async Task<IActionResult> GetAllCards([FromRoute]string filter)
         {
-            CloudStorageAccount account = GetStorageAccount();
-
-            CloudTableClient client = account.CreateCloudTableClient();
-
-            CloudTable table = client.GetTableReference(_config.cardTableName);
-            TableContinuationToken token = null;
-
             TableQuery<CardEntity> query = new TableQuery<CardEntity>().Where(TableQuery.GenerateFilterCondition("Color1", QueryComparisons.Equal, filter));
 
-            //var returnValue = await table.ExecuteQuerySegmentedAsync(query, token);
-
-            var returnValue = await table.ExecuteQuerySegmentedAsync(query, token);
+            var returnValue = await GetCloudTable(_config.cardTableName).ExecuteQuerySegmentedAsync(query, token);
 
             return Ok(returnValue.ToList());
         }
+
+        [Route("value")]
+        public async Task<IActionResult> GetCollectionValue()
+        {
+            var returnValue = await GetCloudTable(_config.cardTableName).ExecuteQuerySegmentedAsync(new TableQuery<CardEntity>(), token);
+
+            float collectionValue = 0;
+
+            foreach (CardEntity card in returnValue.Results)
+            {
+                collectionValue += (float.Parse(card.Price) * card.NumberInCollection);
+            }
+
+            return Ok(collectionValue);
+        }
+
 
         [Route("addCard")]
         public async Task AddNewCard([FromBody]CardEntity card)
@@ -82,9 +79,7 @@ namespace MTGDatabase.Controllers
             card.PartitionKey = card.Set_Short;
             card.RowKey = card.Name.Replace(" // ", " ");
 
-            CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(_config.cardTableName);
-
-            await table.ExecuteAsync(TableOperation.Insert(card));
+            await GetCloudTable(_config.cardTableName).ExecuteAsync(TableOperation.Insert(card));
         }
 
         [Route("removeCard")]
@@ -131,8 +126,6 @@ namespace MTGDatabase.Controllers
         private CloudStorageAccount GetStorageAccount()
         {
             return CloudStorageAccount.Parse(_config.mtgdatabaseConnectionString);
-
-            //return _utility.GetStorageAccount();
         }
 
         private async Task<CardEntity> RetrieveCard(CardEntity Card, string tableName)

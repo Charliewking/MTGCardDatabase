@@ -7,6 +7,7 @@ export class HttpCardService {
 
     private _baseUrl = '';
     public cards: Card[] = [];
+    public collectionValue: string = '';
 
     constructor(private http: Http, @Inject('BASE_URL') baseUrl: string) {
         this._baseUrl = baseUrl;
@@ -74,27 +75,7 @@ export class HttpCardService {
             });
     }
 
+    getCollectionValue() {
+        return this.http.get(this._baseUrl + 'api/cards/value');
+    }
 }
-
-//interface Card {
-//    PartitionKey: string;
-//    RowKey: string;
-//    name: string;
-//    set: string;
-//    colors: string[];
-//    rarity: string;
-//    mana_cost: string;
-//    added: boolean;
-//    power: string;
-//    type_line: string;
-//    color_identity: string;
-//    toughness: string;
-//    image_small: string;
-//    card_text: string;
-//    flavor_text: string;
-//    numberInCollection: number;
-//    cmc: string;
-//    image_uris: any;
-//    set_name: string;
-//    oracle_text: string;
-//}

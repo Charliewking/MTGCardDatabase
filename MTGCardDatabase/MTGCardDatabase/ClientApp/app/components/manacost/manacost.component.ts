@@ -45,6 +45,36 @@ export class ManaCostComponent {
         else if (mana == 'B') {
             return this.blackPath
         }
+        else if (mana == 'B/R') {
+            return this.rakdosPath
+        }
+        else if (mana == 'G/U') {
+            return this.simicPath
+        }
+        else if (mana == 'U/B') {
+            return this.dimirPath
+        }
+        else if (mana == 'W/U') {
+            return this.azoriusPath
+        }
+        else if (mana == 'G/W') {
+            return this.selesniyaPath
+        }
+        else if (mana == 'W/B') {
+            return this.orhzovPath
+        }
+        else if (mana == 'R/W') {
+            return this.borosPath
+        }
+        else if (mana == 'U/R') {
+            return this.izzetPath
+        }
+        else if (mana == 'R/G') {
+            return this.gruulPath
+        }
+        else if (mana == 'B/G') {
+            return this.golgariPath
+        }
         else {
             return this.circlePath
         }
@@ -63,4 +93,14 @@ export class ManaCostComponent {
     public blackPath: string = require("../../assets/magic-mana-small/mana_b.png");
     public whitePath: string = require("../../assets/magic-mana-small/mana_w.png");
     public circlePath: string = require("../../assets/magic-mana-small/mana_circle.png");
+    public gruulPath: string = require("../../assets/magic-mana-small/mana_rg.png");
+    public simicPath: string = require("../../assets/magic-mana-small/mana_gu.png");
+    public golgariPath: string = require("../../assets/magic-mana-small/mana_bg.png");
+    public selesniyaPath: string = require("../../assets/magic-mana-small/mana_gw.png");
+    public izzetPath: string = require("../../assets/magic-mana-small/mana_ur.png");
+    public rakdosPath: string = require("../../assets/magic-mana-small/mana_br.png");
+    public borosPath: string = require("../../assets/magic-mana-small/mana_rw.png");
+    public dimirPath: string = require("../../assets/magic-mana-small/mana_ub.png");
+    public azoriusPath: string = require("../../assets/magic-mana-small/mana_wu.png");
+    public orhzovPath: string = require("../../assets/magic-mana-small/mana_wb.png");
 }
