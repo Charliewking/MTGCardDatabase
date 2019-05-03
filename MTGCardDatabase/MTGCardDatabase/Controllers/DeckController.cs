@@ -54,11 +54,11 @@ namespace MTGDatabase.Controllers
 
                 foreach (DeckCardEntity deckCard in deckCards.Results)
                 {
-                    if (deckCard.NumberInDeck > 1)
+                    if (deckCard.NumberInDeck > 0)
                     {
                         MainDeckTempList.Add(deckCard);
                     }
-                    else
+                    if(deckCard.NumberInSideboard > 0)
                     {
                         SideboardTempList.Add(deckCard);
                     }
@@ -66,6 +66,13 @@ namespace MTGDatabase.Controllers
 
                 deck.MainDeck = MainDeckTempList;
                 deck.Sideboard = SideboardTempList;
+
+                // Populate Deck Tracker Rows
+                TableQuery<DeckTrackerEntity> deckTrackerquery = new TableQuery<DeckTrackerEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Player_Deck));
+
+                var trackerRows = await GetStorageTable(_config.deckTrackerTableName).ExecuteQuerySegmentedAsync(deckTrackerquery, token);
+
+                deck.TrackerRows = trackerRows.ToList();
             }
 
             return Ok(returnValue.ToList());
@@ -151,8 +158,11 @@ namespace MTGDatabase.Controllers
         [Route("deckTracker")]
         public async Task AddDeckTrackerRow([FromBody] DeckTrackerEntity deckTrackerEntry)
         {
-            CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(_config.deckTrackerTableName);
-            await table.ExecuteAsync(TableOperation.Insert(deckTrackerEntry));
+            deckTrackerEntry.PartitionKey = deckTrackerEntry.Owner + "_" + deckTrackerEntry.DeckName;
+            deckTrackerEntry.RowKey = DateTime.Now.ToLocalTime().ToString().Replace("/","-");
+
+
+            await GetStorageTable(_config.deckTrackerTableName).ExecuteAsync(TableOperation.Insert(deckTrackerEntry));
         }
 
         private async Task RemoveDeckTrackerRow(DeckEntity deck)
@@ -179,6 +189,26 @@ namespace MTGDatabase.Controllers
             var returnValue = await table.ExecuteQuerySegmentedAsync(query, token);
 
             return Ok(returnValue.ToList());
+        }
+
+        [HttpGet]
+        [Route("metaDecks")]
+        public async Task<IActionResult> GetMetaDecks()
+        {
+            var returnValue = await GetStorageTable(_config.metaDecksTableName).ExecuteQuerySegmentedAsync(new TableQuery<MetaDeckEntity>(), token);
+
+            return Ok(returnValue.ToList());
+        }
+
+        [HttpPost]
+        [Route("metaDecks")]
+        public async Task AddMetaDeck([FromBody] MetaDeckEntity metaDeck)
+        {
+            metaDeck.PartitionKey = "MetaDeck";
+            metaDeck.RowKey = metaDeck.DeckTypeName.Replace(" ", "");
+
+
+            await GetStorageTable(_config.metaDecksTableName).ExecuteAsync(TableOperation.Insert(metaDeck));
         }
 
         private CloudStorageAccount GetStorageAccount()

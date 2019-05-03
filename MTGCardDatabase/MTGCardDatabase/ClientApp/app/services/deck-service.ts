@@ -1,6 +1,6 @@
 ﻿import { Injectable, Inject } from "@angular/core";
 import { Http, Response } from '@angular/http';
-import { DeckTrackerRow, Deck, Card, DeckCard } from '../interfaces/interfaces';
+import { DeckTrackerRow, Deck, Card, DeckCard, MetaDeck } from '../interfaces/interfaces';
 
 @Injectable()
 export class DeckService {
@@ -13,6 +13,13 @@ export class DeckService {
     public deckConstructed: boolean = true;
     public selectedDeck: Deck = {} as Deck;
     public successText: string = '';
+    public metaDecks: MetaDeck[] = [];
+
+    public deckTrackerRow: DeckTrackerRow = {} as DeckTrackerRow;
+    public trackerPlayedAgainst: string = '';
+    public trackerFormat: string = '';
+    public trackerResult: string = '';
+    public trackerNotes: string = '';
 
     public queryString: string = '';
 
@@ -25,6 +32,9 @@ export class DeckService {
         this.deckCards = [];
         return this.http.get(this._baseUrl + 'api/decks/' + owner).subscribe(result => {
             this.decks = result.json();
+            this.selectedDeck = {} as Deck;
+            this.selectedDeck.name = ' ';
+            this.getMetaDecks();
         });
     }
 
@@ -41,7 +51,7 @@ export class DeckService {
 
     getDeckCards() {
         this.http.get(this._baseUrl + 'api/decks/cards/' + this.selectedDeck.owner + '_' + this.selectedDeck.name).subscribe(result => {
-            this.successText = "Card Retrieved Successfully";
+            this.successText = "Cards Retrieved Successfully";
             this.deckCards = result.json();
             this.deckOwner = this.selectedDeck.owner;
             this.deckName = this.selectedDeck.name;
@@ -49,6 +59,11 @@ export class DeckService {
         }, error => {
             alert(error.json());
         });
+    }
+
+    setSelectedDeck(deck: Deck) {
+        this.selectedDeck = deck;
+        //this.getDeckCards();
     }
 
     addDeck(deck: Deck) {
@@ -85,7 +100,8 @@ export class DeckService {
         this.http.post(this._baseUrl + 'api/deckcards/addcardtodeck/' + this.selectedDeck.constructed, deckCard)
             .subscribe(() => {
                 this.successText = "Card Added Successfully";
-                this.getDeckCards();
+                this.selectedDeck.mainDeck.push(deckCard);
+                this.selectedDeck.cardCount++;
             }, error => {
                 alert(error.json());
             });
@@ -98,7 +114,8 @@ export class DeckService {
         this.http.post(this._baseUrl + 'api/deckcards/addcardtosideboard/' + this.selectedDeck.constructed, deckCard)
             .subscribe(() => {
                 this.successText = "Card Added Successfully";
-                this.getDeckCards();
+                this.selectedDeck.sideboard.push(deckCard);
+                this.selectedDeck.sideboardCount++;
             }, error => {
                 alert(error.json());
             });
@@ -106,7 +123,10 @@ export class DeckService {
 
     removeCardFromDeck(card: DeckCard) {
         return this.http.post(this._baseUrl + 'api/deckcards/removeCardFromDeck', card)
-            .subscribe(data => { }, error => {
+            .subscribe(() => {
+                this.selectedDeck.mainDeck.splice(this.selectedDeck.mainDeck.indexOf(card), 1);
+                this.selectedDeck.cardCount--;
+            }, error => {
                 alert(error.json());
             });
     }
@@ -115,13 +135,17 @@ export class DeckService {
 
         if (sideboard) {
             return this.http.post(this._baseUrl + 'api/deckcards/incrementSideboard', card)
-                .subscribe(data => { }, error => {
+                .subscribe(() => {
+                    this.selectedDeck.sideboardCount++;
+                }, error => {
                     alert(error.json());
                 });
         }
         else {
             return this.http.post(this._baseUrl + 'api/deckcards/increment', card)
-                .subscribe(data => { }, error => {
+                .subscribe(() => {
+                    this.selectedDeck.cardCount++;
+                }, error => {
                     alert(error.json());
                 });
         }
@@ -131,27 +155,57 @@ export class DeckService {
 
         if (sideboard) {
             return this.http.post(this._baseUrl + 'api/deckcards/decrementSideboard', card)
-                .subscribe(data => { }, error => {
+                .subscribe(() => {
+                    this.selectedDeck.sideboardCount--;
+                }, error => {
                     alert(error.json());
                 });
         }
         else {
             return this.http.post(this._baseUrl + 'api/deckcards/decrement', card)
-                .subscribe(data => { }, error => {
+                .subscribe(() => {
+                    this.selectedDeck.cardCount--;
+                }, error => {
                     alert(error.json());
                 });
         }
     }
 
-    addDeckTrackerRow(deckTrackerRow: DeckTrackerRow) {
-        return this.http.post(this._baseUrl + 'api/decks/deckTracker', deckTrackerRow)
-            .subscribe(data => { }, error => {
+    addDeckTrackerRow() {
+
+        this.deckTrackerRow.owner = this.selectedDeck.owner;
+        this.deckTrackerRow.deckName = this.selectedDeck.name;
+
+        return this.http.post(this._baseUrl + 'api/decks/deckTracker', this.deckTrackerRow)
+            .subscribe(() => {
+                this.selectedDeck.trackerRows.push(this.deckTrackerRow);
+                this.deckTrackerRow = {} as DeckTrackerRow;
+            }, error => {
                 alert(error.json());
             });
     }
 
     getDeckTrackerRows(deck: Deck) {
         return this.http.get(this._baseUrl + 'api/decks/deckTracker' + deck);
+    }
+
+    getMetaDecks() {
+        this.http.get(this._baseUrl + 'api/decks/metaDecks')
+            .subscribe(result => {
+                this.metaDecks = result.json();
+            }, error => {
+                alert(error.json());
+            });
+    }
+
+    addMetaDeck(metaDeck: MetaDeck) {
+        this.http.post(this._baseUrl + 'api/decks/metaDecks', metaDeck)
+            .subscribe(() => {
+                this.metaDecks.push(metaDeck);
+                this.deckTrackerRow.playedAgainst = '';
+            }, error => {
+                alert(error.json());
+            });
     }
 
     createDeckCard(card: Card) {

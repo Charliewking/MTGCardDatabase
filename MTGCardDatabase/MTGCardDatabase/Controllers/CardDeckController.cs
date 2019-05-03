@@ -43,9 +43,9 @@ namespace MTGCardDatabase.Controllers
         }
 
         [Route("addCardToDeck/{format}")]
-        public async Task AddCardToDeck([FromBody]DeckCardEntity deckCard,[FromRoute]bool format)
+        public async Task AddCardToDeck([FromBody]DeckCardEntity deckCard, [FromRoute]bool format)
         {
-            deckCard = isCountLimited(deckCard, format);
+            deckCard = IsCountLimited(deckCard, format);
 
             deckCard.PartitionKey = deckCard.Owner + "_" + deckCard.DeckName;
             deckCard.RowKey = deckCard.CardName.Replace(" // ", " ");
@@ -57,13 +57,13 @@ namespace MTGCardDatabase.Controllers
         [Route("addcardtosideboard/{format}")]
         public async Task AddCardToSideboard([FromBody]DeckCardEntity deckCard, [FromRoute]bool format)
         {
-            deckCard = isCountLimited(deckCard, format);
+            deckCard = IsCountLimited(deckCard, format);
 
             deckCard.PartitionKey = deckCard.Owner + "_" + deckCard.DeckName;
             deckCard.RowKey = deckCard.CardName.Replace(" // ", " ");
 
             await GetStorageTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Insert(deckCard));
-            await UpdateDeckStats(deckCard, true);
+            await UpdateSideboardStats(deckCard, true);
         }
 
         [Route("increment")]
@@ -91,7 +91,7 @@ namespace MTGCardDatabase.Controllers
                 {
                     card.NumberInSideboard++;
                     await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Replace(card));
-                    await UpdateDeckStats(deckCard, true);
+                    await UpdateSideboardStats(deckCard, true);
                 }
             }
         }
@@ -103,7 +103,7 @@ namespace MTGCardDatabase.Controllers
             if (card != null)
             {
                 card.NumberInDeck--;
-                if(card.NumberInDeck == 0 && card.NumberInSideboard == 0)
+                if (card.NumberInDeck == 0 && card.NumberInSideboard == 0)
                 {
                     await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Delete(card));
                 }
@@ -130,7 +130,7 @@ namespace MTGCardDatabase.Controllers
                 {
                     await GetCloudTable(_config.deckCardTableName).ExecuteAsync(TableOperation.Replace(card));
                 }
-                await UpdateDeckStats(deckCard, false);
+                await UpdateSideboardStats(deckCard, false);
             }
         }
 
@@ -171,44 +171,42 @@ namespace MTGCardDatabase.Controllers
         {
             CloudTable table = GetStorageTable(_config.deckTableName);
 
-            TableResult retrieved = await table.ExecuteAsync(TableOperation.Retrieve<DeckEntity>(card.Owner,card.DeckName)).ConfigureAwait(true);
+            TableResult retrieved = await table.ExecuteAsync(TableOperation.Retrieve<DeckEntity>(card.Owner, card.DeckName)).ConfigureAwait(true);
 
             DeckEntity stats = (DeckEntity)retrieved.Result;
 
             if (stats != null && add)
             {
                 stats.CardCount++;
-                if (card.Color1 == "R" && card.Color2 == "" ) { stats.RedCards++; }
+                if (card.Color1 == "R" && card.Color2 == "") { stats.RedCards++; }
                 if (card.Color1 == "U" && card.Color2 == "") { stats.BlueCards++; }
                 if (card.Color1 == "G" && card.Color2 == "") { stats.GreenCards++; }
                 if (card.Color1 == "W" && card.Color2 == "") { stats.WhiteCards++; }
                 if (card.Color1 == "B" && card.Color2 == "") { stats.BlackCards++; }
-                if (card.Color1 == "G" && card.Color2 == "W")  { stats.GWCards++; }
-                if (card.Color1 == "G" && card.Color2 == "R")  { stats.GRCards++; }
-                if (card.Color1 == "G" && card.Color2 == "U")  { stats.UGCards++; }
-                if (card.Color1 == "B" && card.Color2 == "G")  { stats.GBCards++; }
-                if (card.Color1 == "R" && card.Color2 == "W")  { stats.WRCards++; }
-                if (card.Color1 == "B" && card.Color2 == "W")  { stats.BWCards++; }
-                if (card.Color1 == "U" && card.Color2 == "W")  { stats.UWCards++; }
-                if (card.Color1 == "B" && card.Color2 == "U")  { stats.UBCards++; }
-                if (card.Color1 == "R" && card.Color2 == "U")  { stats.URCards++; }
-                if (card.Color1 == "B" && card.Color2 == "R")  { stats.RBCards++; }
-                if (card.Type_Line.Contains("Artifact")){ stats.ArtifactCards++; }
-                if (card.Type_Line.Contains("Land")){ stats.LandCards++; }
-                if (card.Type_Line.Contains("Sorcery")){ stats.SorceryCount++; }
-                if (card.Type_Line.Contains("Enchantment")){ stats.EnchantmentCount++; }
-                if (card.Type_Line.Contains("Human")){ stats.HumanCount++; }
-                if (card.Type_Line.Contains("Zombie")){ stats.ZombieCount++; }
-                if (card.Type_Line.Contains("Wizard")){ stats.WizardCount++; }
-                if (card.Type_Line.Contains("Shaman")){ stats.ShamanCount++; }
-                if (card.Type_Line.Contains("Knight")){ stats.KnightCount++; }
-                if (card.Type_Line.Contains("Creature")){ stats.CreatureCount++; }
+                if (card.Color1 == "G" && card.Color2 == "W") { stats.GWCards++; }
+                if (card.Color1 == "G" && card.Color2 == "R") { stats.GRCards++; }
+                if (card.Color1 == "G" && card.Color2 == "U") { stats.UGCards++; }
+                if (card.Color1 == "B" && card.Color2 == "G") { stats.GBCards++; }
+                if (card.Color1 == "R" && card.Color2 == "W") { stats.WRCards++; }
+                if (card.Color1 == "B" && card.Color2 == "W") { stats.BWCards++; }
+                if (card.Color1 == "U" && card.Color2 == "W") { stats.UWCards++; }
+                if (card.Color1 == "B" && card.Color2 == "U") { stats.UBCards++; }
+                if (card.Color1 == "R" && card.Color2 == "U") { stats.URCards++; }
+                if (card.Color1 == "B" && card.Color2 == "R") { stats.RBCards++; }
+                if (card.Type_Line.Contains("Artifact")) { stats.ArtifactCards++; }
+                if (card.Type_Line.Contains("Land")) { stats.LandCards++; }
+                if (card.Type_Line.Contains("Sorcery")) { stats.SorceryCount++; }
+                if (card.Type_Line.Contains("Enchantment")) { stats.EnchantmentCount++; }
+                if (card.Type_Line.Contains("Human")) { stats.HumanCount++; }
+                if (card.Type_Line.Contains("Zombie")) { stats.ZombieCount++; }
+                if (card.Type_Line.Contains("Wizard")) { stats.WizardCount++; }
+                if (card.Type_Line.Contains("Shaman")) { stats.ShamanCount++; }
+                if (card.Type_Line.Contains("Knight")) { stats.KnightCount++; }
+                if (card.Type_Line.Contains("Creature")) { stats.CreatureCount++; }
                 if (card.Type_Line.Contains("Instant")) { stats.InstantCount++; }
-
-                await table.ExecuteAsync(TableOperation.Replace(stats));
             }
             // Otherwise decrement the values
-            else if (stats != null && !add)
+            else if (stats != null && stats.CardCount > 0)
             {
                 stats.CardCount--;
                 if (card.Color1 == "R" && card.Color2 == "") { stats.RedCards--; }
@@ -237,14 +235,33 @@ namespace MTGCardDatabase.Controllers
                 if (card.Type_Line.Contains("Knight")) { stats.KnightCount--; }
                 if (card.Type_Line.Contains("Creature")) { stats.CreatureCount--; }
                 if (card.Type_Line.Contains("Instant")) { stats.InstantCount--; }
-
-                await table.ExecuteAsync(TableOperation.Replace(stats));
             }
+
+            await table.ExecuteAsync(TableOperation.Replace(stats));
+        }
+
+        private async Task UpdateSideboardStats(DeckCardEntity card, bool add)
+        {
+            CloudTable table = GetStorageTable(_config.deckTableName);
+
+            TableResult retrieved = await table.ExecuteAsync(TableOperation.Retrieve<DeckEntity>(card.Owner, card.DeckName)).ConfigureAwait(true);
+
+            DeckEntity stats = (DeckEntity)retrieved.Result;
+
+            if (stats != null && add)
+            {
+                stats.SideboardCount++;
+            }
+            else if (stats != null && stats.SideboardCount > 0)
+            {
+                stats.SideboardCount--;
+            }
+
+            await table.ExecuteAsync(TableOperation.Replace(stats));
         }
 
         public async Task<CardEntity> GetCardDetails(DeckCardEntity deckCard)
         {
-            TableContinuationToken token = null;
             //Get the Card Entity
             CloudTable cardTable = GetStorageTable(_config.cardTableName);
 
@@ -274,6 +291,12 @@ namespace MTGCardDatabase.Controllers
 
         private async Task<DeckCardEntity> RetrieveDeckCard(DeckCardEntity Card, string tableName)
         {
+            if (Card.PartitionKey == null || Card.RowKey == null)
+            {
+                Card.PartitionKey = Card.Owner + "_" + Card.DeckName;
+                Card.RowKey = Card.CardName;
+            }
+
             TableResult retrievedCard = await GetCloudTable(tableName).ExecuteAsync(TableOperation.Retrieve<DeckCardEntity>(Card.PartitionKey, Card.RowKey)).ConfigureAwait(true);
 
             return (DeckCardEntity)retrievedCard.Result;
@@ -291,7 +314,7 @@ namespace MTGCardDatabase.Controllers
             return (CloudStorageAccount.Parse(_config.mtgdatabaseConnectionString)).CreateCloudTableClient().GetTableReference(tableName);
         }
 
-        private DeckCardEntity isCountLimited(DeckCardEntity deckCard, bool format)
+        private DeckCardEntity IsCountLimited(DeckCardEntity deckCard, bool format)
         {
             if(!format || deckCard.CardName == "Mountain" || deckCard.CardName == "Plains" || deckCard.CardName == "Swamp" || deckCard.CardName == "Forest" || deckCard.CardName == "Island" || deckCard.CardName == "Rat Colony" || deckCard.CardName == "Persistent Petitioners")
             {

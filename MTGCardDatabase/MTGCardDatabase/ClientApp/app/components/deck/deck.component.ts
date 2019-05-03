@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { DeckService } from '../../services/deck-service'
 import { HttpCardService } from '../../services/http-service'
 import { ScryfallService } from '../../services/scryfall.service';
-import { Card, Deck, DeckTrackerRow, Player, DeckCard } from '../../interfaces/interfaces';
+import { Card, Deck, MetaDeck, Player, DeckCard } from '../../interfaces/interfaces';
 
 @Component({
     selector: 'deck',
     templateUrl: './deck.component.html',
+    styleUrls: ['./deck.component.css'],
     providers: [DeckService, ScryfallService]
 })
 export class DeckComponent {
@@ -25,6 +26,9 @@ export class DeckComponent {
     public deckName: string = '';
     public deckConstructed: boolean = true;
     public addResult: string = '';
+    public hoveredover: string = '';
+    public hoveredcard: string = '';
+    public newMetaDeck: MetaDeck = {} as MetaDeck;
 
     public queryString: string = '';
 
@@ -82,11 +86,14 @@ export class DeckComponent {
             color5: "",
             mainDeck: [],
             sideboard: [],
+            trackerRows: [],
             landCards: 0,
             creatureCount: 0,
             sorceryCount: 0,
             instantCount: 0,
-            enchantmentCount: 0
+            enchantmentCount: 0,
+            cardCount: 0,
+            sideboardCount: 0
         }
 
         this._deckService.addDeck(deck);
@@ -97,8 +104,8 @@ export class DeckComponent {
     }
 
     setSelectedDeck(deck: Deck) {
-        this._deckService.selectedDeck = deck;
-        this.getDeckCards();
+        this._deckService.setSelectedDeck(deck);
+        this.deckName = deck.name;
     }
 
     getDeckCards() {
@@ -109,15 +116,15 @@ export class DeckComponent {
         this._deckService.getDeckDetails(deckOwner, deckName);
     }
 
-    incrementDeckCard(card: DeckCard) {
-        card.numberInDeck++;
-        this._deckService.incrementDeckCard(card, false);
+    incrementDeckCard(card: DeckCard, sideboard: boolean) {
+        sideboard ? card.numberInSideboard ++ : card.numberInDeck++;
+        this._deckService.incrementDeckCard(card, sideboard);
     }
 
-    decrementDeckCard(card: DeckCard) {
-        card.numberInDeck--;
-        this._deckService.decrementDeckCard(card, false);
-        if (card.numberInDeck == 0) {
+    decrementDeckCard(card: DeckCard, sideboard: boolean) {
+        sideboard ? card.numberInSideboard-- : card.numberInDeck--;
+        this._deckService.decrementDeckCard(card, sideboard);
+        if (card.numberInDeck == 0 || card.numberInSideboard == 0) {
             this.getDeckCards();
         }
     }
@@ -141,6 +148,13 @@ export class DeckComponent {
 
     setSearchQuery(cardName: string) {
         this.getCard(cardName);
+    }
+
+    addMetaDeck() {
+
+
+        this._deckService.addMetaDeck(this.newMetaDeck);
+        this.newMetaDeck = {} as MetaDeck;
     }
 
     getCubeStats() {

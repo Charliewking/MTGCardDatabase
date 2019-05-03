@@ -1,4 +1,4 @@
-﻿export { Card, ScryfallCard, Deck, DeckTrackerRow, Player, DeckCard };
+﻿export { Card, ScryfallCard, Deck, DeckTrackerRow, Player, DeckCard, MetaDeck };
 
 interface Card {
     name: string;
@@ -74,13 +74,15 @@ interface Deck {
     color5: string;
     mainDeck: DeckCard[];
     sideboard: DeckCard[];
+    trackerRows: DeckTrackerRow[];
     constructed: boolean;
     landCards: number;
     creatureCount: number;
     sorceryCount: number;
     instantCount: number;
     enchantmentCount: number;
-
+    cardCount: number;
+    sideboardCount: number;
 }
 
 interface DeckCard {
@@ -112,6 +114,18 @@ interface DeckCard {
     image_Large: any;
     price: string;
 }
+
+interface MetaDeck {
+    deckTypeName: string;
+    bo1Wins: number;
+    bo1Losses: number;
+    bo3Wins: number;
+    bo3Losses: number;
+    bo1WinPercentage: number;
+    bo3WinPercentage: number;
+    active: boolean;
+}
+
 
 interface Player {
     name: string;

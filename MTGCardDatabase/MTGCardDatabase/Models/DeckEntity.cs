@@ -20,6 +20,7 @@ namespace MTGDatabase.Models
         public string Owner { get; set; }
         public List<DeckCardEntity> MainDeck { get; set; }
         public List<DeckCardEntity> Sideboard { get; set; }
+        public List<DeckTrackerEntity> TrackerRows { get; set; }
         public bool Constructed { get; set; }
         public string Color1 { get; set; }
         public string Color2 { get; set; }
@@ -57,5 +58,6 @@ namespace MTGDatabase.Models
         public int KnightCount { get; set; }
         public int AverageCMC { get; set; }
         public int CardCount { get; set; }
+        public int SideboardCount { get; set; }
     }
 }

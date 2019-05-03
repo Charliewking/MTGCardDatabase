@@ -1,0 +1,21 @@
+﻿body {
+}
+
+
+.list-group-hover .list-group-item:hover {
+    background-color: #f5f5f5;
+}
+
+.hoveredDeck{
+    background-color:#dddddd;
+    cursor:pointer;
+}
+
+.selectedDeck{
+    background-color:#cacaca
+}
+
+.hoveredCard {
+    background-color: #dddddd;
+    cursor: pointer;
+}
