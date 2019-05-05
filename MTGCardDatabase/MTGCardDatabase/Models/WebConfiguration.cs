@@ -16,6 +16,8 @@ namespace MTGDatabase.Models
         internal string deckTrackerTableName;
         internal string cubeStats { get; set; }
         internal string metaDecksTableName { get; set; }
+        internal string deckVersusMetaDeckTable { get; set; }
+        internal string playerTableName { get; set; }
 
     }
 }

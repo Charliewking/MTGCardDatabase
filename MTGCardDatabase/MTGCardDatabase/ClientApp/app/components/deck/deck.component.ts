@@ -24,6 +24,7 @@ export class DeckComponent {
     public deckCards: DeckCard[] = [];
     public deckOwner: string = '';
     public deckName: string = '';
+    public deckRename: string = '';
     public deckConstructed: boolean = true;
     public addResult: string = '';
     public hoveredover: string = '';
@@ -36,16 +37,8 @@ export class DeckComponent {
     public _cardService: HttpCardService;
     public _scryfallService: ScryfallService;
 
-    public players: Player[] = [
-        { "name": "Ironstream" },
-        { "name": "MediaPlay" },
-        { "name": "BronzeSword" },
-        { "name": "AJSnips" },
-    ]
-
     ngOnInit() {
-        //this.getDeckCards("Charlie", "Saprolings");
-        //this.getDecks("Charlie");
+        this._deckService.getPlayers();
     }
 
     constructor(private deckService: DeckService, private cardService: HttpCardService, private scryfallService: ScryfallService) {
@@ -87,6 +80,7 @@ export class DeckComponent {
             mainDeck: [],
             sideboard: [],
             trackerRows: [],
+            notes: "",
             landCards: 0,
             creatureCount: 0,
             sorceryCount: 0,

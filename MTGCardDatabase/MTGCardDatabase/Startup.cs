@@ -37,6 +37,8 @@ namespace MTGCardDatabase
                 options.deckTrackerTableName = Configuration["TableNames:deckTrackerTable"];
                 options.cubeStats = Configuration["TableNames:cubeStats"];
                 options.metaDecksTableName = Configuration["TableNames:metaDeckTable"];
+                options.deckVersusMetaDeckTable = Configuration["TableNames:deckVersusMetaDeckTable"];
+                options.playerTableName = Configuration["TableNames:playerTableName"];
             });
         }
 
