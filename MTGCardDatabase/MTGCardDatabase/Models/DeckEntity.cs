@@ -21,6 +21,13 @@ namespace MTGDatabase.Models
         public List<DeckCardEntity> MainDeck { get; set; }
         public List<DeckCardEntity> Sideboard { get; set; }
         public List<DeckTrackerEntity> TrackerRows { get; set; }
+        public string Notes { get; set; }
+        public int Bo1Wins { get; set; }
+        public int Bo3Wins { get; set; }
+        public int Bo1Losses { get; set; }
+        public int Bo3Losses { get; set; }
+        public int Bo1Played { get; set; }
+        public int Bo3Played { get; set; }
         public bool Constructed { get; set; }
         public string Color1 { get; set; }
         public string Color2 { get; set; }

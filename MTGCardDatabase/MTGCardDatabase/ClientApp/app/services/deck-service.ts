@@ -1,6 +1,7 @@
 ﻿import { Injectable, Inject } from "@angular/core";
 import { Http, Response } from '@angular/http';
-import { DeckTrackerRow, Deck, Card, DeckCard, MetaDeck } from '../interfaces/interfaces';
+import { DeckTrackerRow, Deck, Card, DeckCard, MetaDeck, Player } from '../interfaces/interfaces';
+import { forEach } from "@angular/router/src/utils/collection";
 
 @Injectable()
 export class DeckService {
@@ -8,9 +9,11 @@ export class DeckService {
     private _baseUrl = '';
     public decks: Deck[] = [];
     public deckCards: DeckCard[] = [];
+    public players: Player[] = [];
     public deckOwner: string = '';
     public deckName: string = '';
     public deckConstructed: boolean = true;
+    public showRenamebox: string = '';
     public selectedDeck: Deck = {} as Deck;
     public successText: string = '';
     public metaDecks: MetaDeck[] = [];
@@ -35,6 +38,16 @@ export class DeckService {
             this.selectedDeck = {} as Deck;
             this.selectedDeck.name = ' ';
             this.getMetaDecks();
+        });
+    }
+
+    getPlayers() {
+        this.http.get(this._baseUrl + 'api/player').subscribe(result => {
+            this.players = result.json() as Player[];
+            for(let player of this.players){
+                player.bo1WinRate = (player.bo1Wins == 0 && player.bo1Losses == 0) ? 0 : Math.round((player.bo1Wins / (player.bo1Wins + player.bo1Losses))*100);
+                player.bo3WinRate = (player.bo3Wins == 0 && player.bo3Losses == 0) ? 0 : Math.round((player.bo3Wins / (player.bo3Wins + player.bo3Losses))*100);
+            }
         });
     }
 
@@ -76,6 +89,29 @@ export class DeckService {
                     this.getDecks(deck.owner);
                 }
             );
+    }
+
+    duplicateDeck(deck: Deck) {
+
+        return this.http.post(this._baseUrl + 'api/decks/duplicateDeck', deck)
+            .subscribe(data => { }, error => {
+                alert(error.json());
+            },
+                () => {
+                    this.getDecks(deck.owner);
+                }
+            );
+    }
+
+    renameDeck(deck: Deck, newDeckName: string) {
+
+        return this.http.post(this._baseUrl + 'api/decks/renameDeck/' + newDeckName, deck)
+            .subscribe(() => {
+                this.getDecks(deck.owner);
+                this.showRenamebox = '';
+            }, error => {
+                alert(error.json());
+            });
     }
 
     removeDeck(deck: Deck) {

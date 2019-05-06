@@ -3,7 +3,7 @@
 </div>
 
 <span class="mana" *ngFor="let mana of full_Cost" style="margin-bottom:5px;font-weight:bold;">
-    <span style="position:absolute;font-size:small;transform:translateY(-1px,1px);" *ngIf="isDigit(mana)">{{mana}}</span>
+    <span style="position:absolute;font-size:small;transform:translateY(-1px,1px);color:black;" *ngIf="isDigit(mana)">{{mana}}</span>
     <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
 
 </span>

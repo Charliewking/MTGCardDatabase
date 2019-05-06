@@ -9,6 +9,11 @@
     }
 }
 
+.body {
+    color:white!important;
+    background-color:black!important;
+}
+
 .navbar .container-fluid > .navbar-header {
     float: left;
     margin-right: 10px;

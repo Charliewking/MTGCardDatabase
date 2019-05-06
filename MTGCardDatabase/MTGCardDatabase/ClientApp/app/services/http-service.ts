@@ -1,6 +1,6 @@
 ﻿import { Injectable, Inject } from "@angular/core";
 import { Http, Response } from '@angular/http';
-import { Card, ScryfallCard } from '../interfaces/interfaces'
+import { Card } from '../interfaces/interfaces'
 
 @Injectable()
 export class HttpCardService {

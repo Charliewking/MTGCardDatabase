@@ -110,6 +110,38 @@ namespace MTGDatabase.Controllers
         }
 
         [HttpPost]
+        //[ProducesResponseType(typeof(string), 200)]
+        //[ProducesResponseType(typeof(string), 400)]
+        //[ProducesResponseType(typeof(string), 500)]
+        [Route("duplicateDeck")]
+        public async Task duplicateDeck([FromBody]DeckEntity deck)
+        {
+            TableResult result = await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Retrieve<DeckEntity>(deck.Owner, deck.Name)).ConfigureAwait(true);
+            DeckEntity duplicateDeck = (DeckEntity)result.Result;
+
+            duplicateDeck.RowKey = deck.RowKey + "-Copy";
+            duplicateDeck.Name = deck.Name + "-Copy";
+
+            await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Insert(duplicateDeck));
+        }
+
+        [HttpPost]
+        //[ProducesResponseType(typeof(string), 200)]
+        //[ProducesResponseType(typeof(string), 400)]
+        //[ProducesResponseType(typeof(string), 500)]
+        [Route("renameDeck/{newDeckName}")]
+        public async Task renameDeck([FromBody]DeckEntity deck, [FromRoute]string newDeckName)
+        {
+            TableResult result = await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Retrieve<DeckEntity>(deck.PartitionKey, deck.RowKey)).ConfigureAwait(true);
+            DeckEntity renameDeck = (DeckEntity)result.Result;
+
+            renameDeck.Name = newDeckName;
+
+            await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Replace(renameDeck));
+        }
+
+
+        [HttpPost]
         [Route("RemoveDeck")]
         public async Task RemoveDeck([FromBody]DeckEntity deck)
         {
@@ -149,8 +181,6 @@ namespace MTGDatabase.Controllers
             //    TableQuerySegment <CardEntity> returnCard = await cardTable.ExecuteQuerySegmentedAsync(finalQuery, token);
             //    deckList.Add(returnCard.FirstOrDefault());
             //}
-
-
             //return Ok(deckList);
         }
 
@@ -161,7 +191,49 @@ namespace MTGDatabase.Controllers
             deckTrackerEntry.PartitionKey = deckTrackerEntry.Owner + "_" + deckTrackerEntry.DeckName;
             deckTrackerEntry.RowKey = DateTime.Now.ToLocalTime().ToString().Replace("/","-");
 
+            // Add 1 to Games Played in DeckEntity, Check for DeckversusMeta Row/Increment or create, Update MetaDeckEntity
 
+            TableResult varDeck = await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Retrieve<DeckEntity>(deckTrackerEntry.Owner, deckTrackerEntry.DeckName)).ConfigureAwait(true);
+            DeckEntity returnDeck = (DeckEntity)varDeck.Result;
+
+            TableResult varMetaDeck = await GetStorageTable(_config.metaDecksTableName).ExecuteAsync(TableOperation.Retrieve<MetaDeckEntity>("MetaDeck", deckTrackerEntry.PlayedAgainst.Replace(" ",""))).ConfigureAwait(true);
+            MetaDeckEntity returnMetaDeck = (MetaDeckEntity)varMetaDeck.Result;
+
+            TableResult varDeckVersusMetaDeck = await GetStorageTable(_config.deckVersusMetaDeckTable).ExecuteAsync(TableOperation.Retrieve<DeckVersusMetaDeckEntity>(deckTrackerEntry.Owner + "_" + deckTrackerEntry.DeckName, deckTrackerEntry.PlayedAgainst)).ConfigureAwait(true);
+            DeckVersusMetaDeckEntity returnDeckVersusMetaDeck = (DeckVersusMetaDeckEntity)varDeckVersusMetaDeck.Result;
+
+            TableResult varPlayer = await GetStorageTable(_config.playerTableName).ExecuteAsync(TableOperation.Retrieve<PlayerEntity>("Player", deckTrackerEntry.Owner)).ConfigureAwait(true);
+            PlayerEntity returnPlayer = (PlayerEntity)varPlayer.Result;
+
+            if (returnDeckVersusMetaDeck == null) {
+                DeckVersusMetaDeckEntity newDeckVersusMetaDeck = new DeckVersusMetaDeckEntity
+                {
+                    PartitionKey = deckTrackerEntry.Owner + "_" + deckTrackerEntry.DeckName,
+                    RowKey = deckTrackerEntry.PlayedAgainst,
+                    MetaDeckName = deckTrackerEntry.PlayedAgainst
+                };
+                await GetStorageTable(_config.deckVersusMetaDeckTable).ExecuteAsync(TableOperation.Insert(newDeckVersusMetaDeck));
+            }
+
+            varDeckVersusMetaDeck = await GetStorageTable(_config.deckVersusMetaDeckTable).ExecuteAsync(TableOperation.Retrieve<DeckVersusMetaDeckEntity>(deckTrackerEntry.Owner + "_" + deckTrackerEntry.DeckName, deckTrackerEntry.PlayedAgainst)).ConfigureAwait(true);
+            returnDeckVersusMetaDeck = (DeckVersusMetaDeckEntity)varDeckVersusMetaDeck.Result;
+
+
+            if (deckTrackerEntry.Format == "Bo3") {
+                returnDeck.Bo3Played++;
+                if (deckTrackerEntry.Result == "Win" ) { returnDeck.Bo3Wins++; returnMetaDeck.Bo3Wins++; returnDeckVersusMetaDeck.Bo3Wins++; returnPlayer.Bo3Wins++; }
+                else { returnDeck.Bo3Losses++; returnMetaDeck.Bo3Losses++; returnDeckVersusMetaDeck.Bo3Losses++; returnPlayer.Bo3Losses++;  }
+            } else {
+                returnDeck.Bo1Played++;
+                if (deckTrackerEntry.Result == "Win") { returnDeck.Bo1Wins++; returnMetaDeck.Bo1Wins++; returnDeckVersusMetaDeck.Bo1Wins++; returnPlayer.Bo1Wins++; }
+                else { returnDeck.Bo1Losses++; returnMetaDeck.Bo1Losses++; returnDeckVersusMetaDeck.Bo1Losses++; returnPlayer.Bo1Losses++; }
+            }
+
+
+            await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Replace(returnDeck));
+            await GetStorageTable(_config.metaDecksTableName).ExecuteAsync(TableOperation.Replace(returnMetaDeck));
+            await GetStorageTable(_config.deckVersusMetaDeckTable).ExecuteAsync(TableOperation.Replace(returnDeckVersusMetaDeck));
+            await GetStorageTable(_config.playerTableName).ExecuteAsync(TableOperation.Replace(returnPlayer));
             await GetStorageTable(_config.deckTrackerTableName).ExecuteAsync(TableOperation.Insert(deckTrackerEntry));
         }
 

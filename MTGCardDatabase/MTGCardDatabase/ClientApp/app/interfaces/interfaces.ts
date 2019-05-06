@@ -26,7 +26,6 @@ interface Card {
     price: string;
 }
 
-
 interface ScryfallCard {
     name: string;
     set: string;
@@ -59,6 +58,7 @@ interface DeckTrackerRow {
     owner: string;
     deckName: string;
     playedAgainst: string;
+    rank: string;
     format: string;
     result: string;
     notes: string;
@@ -75,6 +75,7 @@ interface Deck {
     mainDeck: DeckCard[];
     sideboard: DeckCard[];
     trackerRows: DeckTrackerRow[];
+    notes: string;
     constructed: boolean;
     landCards: number;
     creatureCount: number;
@@ -126,7 +127,15 @@ interface MetaDeck {
     active: boolean;
 }
 
-
 interface Player {
     name: string;
+    rankConstructed: string;
+    rankLimited: string;
+    decks: Deck[];
+    bo1Wins: number;
+    bo3Wins: number;
+    bo1WinRate: number;
+    bo1Losses: number;
+    bo3Losses: number;
+    bo3WinRate: number;
 }

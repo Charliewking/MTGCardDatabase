@@ -38,7 +38,7 @@ namespace MTGDatabase.Controllers
         [Route("")]
         public async Task<IActionResult> GetAllCards()
         {
-            var returnValue = await GetCloudTable(_config.cardTableName).ExecuteQuerySegmentedAsync(new TableQuery<CardEntity>().Take(20), token);
+            var returnValue = await GetCloudTable(_config.cardTableName).ExecuteQuerySegmentedAsync(new TableQuery<CardEntity>(), token);
 
             return Ok(returnValue.ToList());
         }

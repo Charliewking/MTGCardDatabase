@@ -18,6 +18,7 @@ namespace MTGCardDatabase.Models
         public string DeckName { get; set; }
         public string PlayedAgainst { get; set; }
         public string Format { get; set; }
+        public string Rank { get; set; }
         public string Result { get; set; }
         public string Notes { get; set; }
     }

@@ -1,4 +1,4 @@
-<h1>Decks</h1>
+<h1>Leaderboard</h1>
 <!--<div class="row">
     <div class="col-sm-1">R: {{ourCube.redCards}}</div>
     <div class="col-sm-1">W: {{ourCube.whiteCards}}</div>
@@ -41,8 +41,17 @@
 
 <div class="row">
     <div class="col-sm-6">
+        <table class="table">
+            <tbody>
+                <tr *ngFor="let player of _deckService.players | playersort; let i = index">
+                    <td><h3>#{{i+1}} - {{player.name}}</h3></td>
+                    <td><h3>Bo1: {{player.bo1Wins}}-{{player.bo1Losses}} ({{player.bo1WinRate}}%)</h3></td>
+                    <td><h3>Bo3: {{player.bo3Wins}}-{{player.bo3Losses}} ({{player.bo3WinRate}}%)</h3></td>
+                </tr>
+            </tbody>
+        </table>
         <select class="form-control" [(ngModel)]="deckOwner" (change)="getDecks(deckOwner)">
-            <option *ngFor="let player of players" value="{{player.name}}">{{player.name}}</option>
+            <option *ngFor="let player of _deckService.players" value="{{player.name}}">{{player.name}}</option>
         </select>
         <input type="text" [(ngModel)]="deckName" placeholder="DeckName">
         <span>
@@ -57,7 +66,12 @@
             <li *ngFor="let deck of _deckService.decks" class="list-group-item" (mouseover)="hoveredover=deck.name" (mouseout)="hoveredover=''" [ngClass]="[(hoveredover == deck.name) ? 'hoveredDeck' : '', (deckName == deck.name) ? 'selectedDeck' : '' ]">
                 <!-- [ngClass]="[(deckName == deck.name) ? 'selectedDeck' : '']" -->
                 <a style="float:left;text-decoration:none;" (click)="setSelectedDeck(deck)"><h4 style="margin-top:2px;">{{deck.name}}</h4></a>
-                <button style="float:right;" type="button" class="btn btn-danger" (click)="removeDeck(deck)">Delete Deck</button>
+                <button style="float:left;" type="button" class="btn btn-default" (click)="_deckService.showRenamebox = deck.name"><i class="glyphicon-pencil"></i></button>
+                <input type="text" *ngIf="_deckService.showRenamebox == deck.name" (keyup.enter)="_deckService.renameDeck(deck, deckRename)" placeholder="{{deck.name}}" [(ngModel)]="deckRename" />
+                <button style="float:left;" *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-default" (click)="_deckService.renameDeck(deck, deckRename)">Rename</button>
+                <button *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-default" (click)="_deckService.showRenamebox = ''"><i class="glyphicon-pencil"></i></button>
+                <button style="float:right;" *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-success" (click)="_deckService.duplicateDeck(deck)">Duplicate Deck</button>
+                <button style="float:right;" *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-danger" (click)="removeDeck(deck)">Delete Deck</button>
             </li>
         </ul>
     </div>
@@ -91,11 +105,16 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-6">
+            <textarea cols="80" type="text" placeholder="Notes" [(ngModel)]="_deckService.selectedDeck.notes"></textarea>
+        </div>
+
     </div>
     <div class="col-sm-6">
         <div class="row" *ngIf="_deckService.selectedDeck.name != ' '">
             <div class="col-md-2">
-                {{_deckService.selectedDeck.name}}
+                <h3>{{_deckService.selectedDeck.name}}</h3>
             </div>
             <div *ngIf="this.deckConstructed" class="col-md-2">
                 {{_deckService.selectedDeck.cardCount}}/60 cards
@@ -190,8 +209,9 @@
 <div class="row" *ngIf="_deckService.selectedDeck.name != ' '">
     <div class="col-md-1">
         <select class="form-control" [(ngModel)]="_deckService.deckTrackerRow.playedAgainst" placeholder="Played Against">
+            <option selected="selected" >Played Against</option>
             <option *ngFor="let metaDeck of _deckService.metaDecks">{{metaDeck.deckTypeName}}</option>
-            <option value="AddNewMetaDeck" >Add New MetaDeck</option>
+            <option value="AddNewMetaDeck">Add New MetaDeck</option>
         </select>
     </div>
     <div class="col-md-1">
@@ -206,11 +226,14 @@
             <option>Loss</option>
         </select>
     </div>
+    <div class="col-md-1">
+        <input type="text" [(ngModel)]="_deckService.deckTrackerRow.rank" placeholder="Current Rank"/>
+    </div>
     <div class="col-md-6">
-        <textarea cols="80" type="text" placeholder="Notes" [(ngModel)]="_deckService.deckTrackerRow.notes" ></textarea>
+        <textarea cols="80" type="text" placeholder="Notes" [(ngModel)]="_deckService.deckTrackerRow.notes"></textarea>
     </div>
     <div class="col-md-1">
-        <button class="btn btn-info" (click)="_deckService.addDeckTrackerRow()">Submit Result</button>
+        <button class="btn btn-info" (disabled)="metaDeck.deckTypeName = ''" (click)="_deckService.addDeckTrackerRow()">Submit Result</button>
     </div>
 </div>
 
