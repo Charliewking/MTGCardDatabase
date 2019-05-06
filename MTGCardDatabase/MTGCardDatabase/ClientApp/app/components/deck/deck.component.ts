@@ -30,6 +30,8 @@ export class DeckComponent {
     public hoveredover: string = '';
     public hoveredcard: string = '';
     public newMetaDeck: MetaDeck = {} as MetaDeck;
+    public hoveredPlayer: string = '';
+    public selectedPlayer: string = '';
 
     public queryString: string = '';
 
@@ -60,6 +62,7 @@ export class DeckComponent {
     getDecks(owner: string) {
         this.deckCards = [];
         this._deckService.getDecks(owner);
+        this.selectedPlayer = owner;
     }
 
     createNewDeck() {
@@ -80,6 +83,12 @@ export class DeckComponent {
             mainDeck: [],
             sideboard: [],
             trackerRows: [],
+            bo1Wins: 0,
+            bo1Losses: 0,
+            bo1Played: 0,
+            bo3Wins: 0,
+            bo3Losses: 0,
+            bo3Played: 0,
             notes: "",
             landCards: 0,
             creatureCount: 0,
