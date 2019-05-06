@@ -30,6 +30,7 @@
     <None Remove="ClientApp\app\pipes\card-cmc.pipe.ts" />
     <None Remove="ClientApp\app\pipes\card-rarity.pipe.ts" />
     <None Remove="ClientApp\app\pipes\card-text.pipe.ts" />
+    <None Remove="ClientApp\app\pipes\player-winrate.pipe.ts" />
     <None Remove="ClientApp\app\styles\mana-cost.ts" />
   </ItemGroup>
 
@@ -40,6 +41,7 @@
     <TypeScriptCompile Include="ClientApp\app\pipes\card-cmc.pipe.ts" />
     <TypeScriptCompile Include="ClientApp\app\pipes\card-rarity.pipe.ts" />
     <TypeScriptCompile Include="ClientApp\app\pipes\card-text.pipe.ts" />
+    <TypeScriptCompile Include="ClientApp\app\pipes\player-winrate.pipe.ts" />
     <TypeScriptCompile Include="ClientApp\app\styles\mana-cost.ts" />
   </ItemGroup>
 
@@ -50,6 +52,10 @@
   <ItemGroup>
     <Folder Include="ClientApp\app\assets\magic-mana-embossed\" />
     <Folder Include="ClientApp\app\directives\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\dist\mtgcarddbstyles.css" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { DeckService } from '../../services/deck-service'
 import { HttpCardService } from '../../services/http-service'
 import { ScryfallService } from '../../services/scryfall.service';
-import { Card, Deck, MetaDeck, Player, DeckCard } from '../../interfaces/interfaces';
+import { Card, Deck, MetaDeck, DeckCard } from '../../interfaces/interfaces';
 
 @Component({
     selector: 'deck',

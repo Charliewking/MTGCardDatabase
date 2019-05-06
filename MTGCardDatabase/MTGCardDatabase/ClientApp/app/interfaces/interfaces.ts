@@ -134,6 +134,8 @@ interface Player {
     decks: Deck[];
     bo1Wins: number;
     bo3Wins: number;
+    bo1WinRate: number;
     bo1Losses: number;
     bo3Losses: number;
+    bo3WinRate: number;
 }
