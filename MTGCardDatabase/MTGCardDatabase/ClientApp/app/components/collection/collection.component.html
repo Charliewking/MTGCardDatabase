@@ -82,14 +82,15 @@
 
     <div class="row">
         <div class="col-sm-3 col-md-3 col-lg-2" *ngFor="let card of _httpCardService.cards | cardRarityFilter: rarityString | cardTextFilter: queryString; let i = index">
-            <div class="card" style="width: 18rem;margin:5%;">
-                <img class="card-img-top" src={{card.image_Normal}} alt="Card image cap">
+            <div class="card" style="width:18rem;margin:5%;">
+                <img class="card-img-top" style="background-color:transparent;" src={{card.image_Normal}} alt="Card image cap">
                 <div class="card-body">
                     <h5 class="card-title">{{card.name}}</h5>
                     <mana-cost [mana]="card.mana_Cost"></mana-cost>
-                    <p class="card-text">{{card.card_Text}}</p>
+                    <!--<p class="card-text">{{card.card_Text}}</p>-->
                     <h4 style="float:left;margin-right:10px;font-weight:bolder;">{{ card.numberInCollection }} - ${{card.price}}</h4>
-                    <a href="#" (click)="addCard(card)" class="btn btn-primary">Add to Deck</a>
+                    <br />
+                    <button style="margin:auto;" (click)="addCard(card)" class="btn">Add to Deck</button>
                 </div>
             </div>
         </div>

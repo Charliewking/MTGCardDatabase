@@ -9,12 +9,21 @@
 }
 
 .hoveredDeck{
-    background-color:#dddddd;
+    background-color:#dddddd!important;
     cursor:pointer;
 }
 
+.hoveredPlayer {
+    background-color: #dddddd;
+    cursor: pointer;
+}
+
 .selectedDeck{
-    background-color:#cacaca
+    background-color:#cacaca!important;
+}
+
+.selectedPlayer {
+    background-color: #cacaca
 }
 
 .hoveredCard {

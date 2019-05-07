@@ -75,6 +75,12 @@ interface Deck {
     mainDeck: DeckCard[];
     sideboard: DeckCard[];
     trackerRows: DeckTrackerRow[];
+    bo1Wins: number;
+    bo1Losses: number;
+    bo3Wins: number;
+    bo3Losses: number;
+    bo3Played: number;
+    bo1Played: number;
     notes: string;
     constructed: boolean;
     landCards: number;

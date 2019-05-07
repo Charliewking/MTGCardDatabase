@@ -66,7 +66,14 @@ namespace MTGDatabase.Controllers
 
             foreach (CardEntity card in returnValue.Results)
             {
-                collectionValue += (float.Parse(card.Price) * card.NumberInCollection);
+                try
+                {
+                    collectionValue += (float.Parse(card.Price) * card.NumberInCollection);
+                }
+                catch
+                {
+                    continue;
+                }
             }
 
             return Ok(collectionValue);

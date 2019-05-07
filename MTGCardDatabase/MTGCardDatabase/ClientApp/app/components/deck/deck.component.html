@@ -43,29 +43,29 @@
     <div class="col-sm-6">
         <table class="table">
             <tbody>
-                <tr *ngFor="let player of _deckService.players | playersort; let i = index">
+                <tr (click)="getDecks(player.name)" *ngFor="let player of _deckService.players | playersort; let i = index" (mouseover)="hoveredPlayer=player.name" (mouseout)="hoveredPlayer=''" [ngClass]="[(hoveredPlayer == player.name) ? 'hoveredPlayer' : '', (selectedPlayer == player.name) ? 'selectedPlayer' : '' ]">
                     <td><h3>#{{i+1}} - {{player.name}}</h3></td>
                     <td><h3>Bo1: {{player.bo1Wins}}-{{player.bo1Losses}} ({{player.bo1WinRate}}%)</h3></td>
                     <td><h3>Bo3: {{player.bo3Wins}}-{{player.bo3Losses}} ({{player.bo3WinRate}}%)</h3></td>
                 </tr>
             </tbody>
         </table>
-        <select class="form-control" [(ngModel)]="deckOwner" (change)="getDecks(deckOwner)">
+        <!--<select class="form-control" [(ngModel)]="deckOwner" (change)="getDecks(deckOwner)">
             <option *ngFor="let player of _deckService.players" value="{{player.name}}">{{player.name}}</option>
-        </select>
-        <input type="text" [(ngModel)]="deckName" placeholder="DeckName">
-        <span>
+        </select>-->
+        <input type="text" [(ngModel)]="deckName" placeholder="New Deck Name" *ngIf="selectedPlayer != ''">
+        <span *ngIf="selectedPlayer != ''">
             Constructed Deck?
             <input type="checkbox" [(ngModel)]="deckConstructed">
         </span>
-        <button [disabled]="!deckOwner || !deckName" class="btn" (click)="createNewDeck()">Add New Deck</button>
+        <button [disabled]="!deckOwner || !deckName" class="btn" (click)="createNewDeck()" *ngIf="selectedPlayer != ''">Create Deck</button>
     </div>
     <div class="col-sm-6">
         <ul class="list-group" style="max-height:200px;overflow:auto;">
             <!--*ngIf="_deckService.decks"-->
             <li *ngFor="let deck of _deckService.decks" class="list-group-item" (mouseover)="hoveredover=deck.name" (mouseout)="hoveredover=''" [ngClass]="[(hoveredover == deck.name) ? 'hoveredDeck' : '', (deckName == deck.name) ? 'selectedDeck' : '' ]">
                 <!-- [ngClass]="[(deckName == deck.name) ? 'selectedDeck' : '']" -->
-                <a style="float:left;text-decoration:none;" (click)="setSelectedDeck(deck)"><h4 style="margin-top:2px;">{{deck.name}}</h4></a>
+                <a style="float:left;text-decoration:none;" (click)="setSelectedDeck(deck)"><h4 style="margin-top:2px;">{{deck.name}} (Bo1: {{deck.bo1Wins}}-{{deck.bo1Losses}} Bo3: {{deck.bo3Wins}}-{{deck.bo3Losses}})</h4></a>
                 <button style="float:left;" type="button" class="btn btn-default" (click)="_deckService.showRenamebox = deck.name"><i class="glyphicon-pencil"></i></button>
                 <input type="text" *ngIf="_deckService.showRenamebox == deck.name" (keyup.enter)="_deckService.renameDeck(deck, deckRename)" placeholder="{{deck.name}}" [(ngModel)]="deckRename" />
                 <button style="float:left;" *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-default" (click)="_deckService.renameDeck(deck, deckRename)">Rename</button>
@@ -205,7 +205,11 @@
         </table>
     </div>
 </div>
-
+<div class="row" *ngIf="_deckService.selectedDeck.name != ' '">
+    <div class="col-md-3">
+        <h2>New Game Result</h2>
+    </div>
+</div>
 <div class="row" *ngIf="_deckService.selectedDeck.name != ' '">
     <div class="col-md-1">
         <select class="form-control" [(ngModel)]="_deckService.deckTrackerRow.playedAgainst" placeholder="Played Against">
