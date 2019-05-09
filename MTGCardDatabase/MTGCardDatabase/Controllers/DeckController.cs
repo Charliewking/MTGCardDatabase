@@ -43,7 +43,7 @@ namespace MTGDatabase.Controllers
 
             foreach (DeckEntity deck in returnValue.ToList())
             {
-                string Player_Deck = PlayerName + "_" + deck.Name;
+                string Player_Deck = PlayerName + "_" + deck.RowKey;
 
                 TableQuery<DeckCardEntity> deckCardquery = new TableQuery<DeckCardEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Player_Deck));
 
@@ -116,7 +116,7 @@ namespace MTGDatabase.Controllers
         [Route("duplicateDeck")]
         public async Task duplicateDeck([FromBody]DeckEntity deck)
         {
-            TableResult result = await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Retrieve<DeckEntity>(deck.Owner, deck.Name)).ConfigureAwait(true);
+            TableResult result = await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Retrieve<DeckEntity>(deck.Owner, deck.RowKey)).ConfigureAwait(true);
             DeckEntity duplicateDeck = (DeckEntity)result.Result;
 
             duplicateDeck.RowKey = deck.RowKey + "-Copy";
@@ -147,7 +147,7 @@ namespace MTGDatabase.Controllers
         {
             //await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Delete(deck));
             await RemoveDeckTrackerRow(deck);
-            TableResult result = await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Retrieve<DeckEntity>(deck.Owner, deck.Name)).ConfigureAwait(true);
+            TableResult result = await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Retrieve<DeckEntity>(deck.Owner, deck.RowKey)).ConfigureAwait(true);
             DeckEntity removeDeck = (DeckEntity)result.Result;
             await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Delete(removeDeck));
         }
@@ -237,10 +237,19 @@ namespace MTGDatabase.Controllers
             await GetStorageTable(_config.deckTrackerTableName).ExecuteAsync(TableOperation.Insert(deckTrackerEntry));
         }
 
+        [HttpPost]
+        [Route("addNotes")]
+        public async Task AddDeckNotes ([FromBody] DeckEntity deck)
+        {
+            //TableResult varDeck = await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Retrieve<DeckEntity>(deck.PartitionKey, deck.RowKey)).ConfigureAwait(true);
+            //DeckEntity returnDeck = (DeckEntity)varDeck.Result;
+            await GetStorageTable(_config.deckTableName).ExecuteAsync(TableOperation.Replace(deck));
+        }
+
         private async Task RemoveDeckTrackerRow(DeckEntity deck)
         {
             CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(_config.deckTrackerTableName);
-            TableQuery<DeckEntity> query = new TableQuery<DeckEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, deck.Name));
+            TableQuery<DeckEntity> query = new TableQuery<DeckEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, deck.RowKey));
 
             var returnValue = await table.ExecuteQuerySegmentedAsync(query, token);
 
@@ -256,7 +265,7 @@ namespace MTGDatabase.Controllers
         public async Task<IActionResult> GetDeckTrackerRow([FromRoute] DeckEntity deck)
         {
             CloudTable table = GetStorageAccount().CreateCloudTableClient().GetTableReference(_config.deckTrackerTableName);
-            TableQuery<DeckEntity> query = new TableQuery<DeckEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, deck.Name));
+            TableQuery<DeckEntity> query = new TableQuery<DeckEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, deck.RowKey));
 
             var returnValue = await table.ExecuteQuerySegmentedAsync(query, token);
 

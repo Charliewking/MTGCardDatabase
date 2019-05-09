@@ -56,6 +56,7 @@ interface CardFace {
 
 interface DeckTrackerRow {
     owner: string;
+    rowKey: string;
     deckName: string;
     playedAgainst: string;
     rank: string;
@@ -65,6 +66,7 @@ interface DeckTrackerRow {
 }
 
 interface Deck {
+    rowKey: string;
     owner: string;
     name: string;
     color1: string;

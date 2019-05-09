@@ -66,12 +66,13 @@ export class DeckComponent {
     }
 
     createNewDeck() {
-        this.newDeck(this.deckOwner, this.deckName, this.deckConstructed);
+        this.newDeck(this.selectedPlayer, this.deckName, this.deckConstructed);
         this.deckName = '';
     }
 
     newDeck(deckOwner: string, deckName: string, deckConstructed: boolean) {
         let deck: Deck = {
+            rowKey: "",
             owner: deckOwner,
             name: deckName,
             constructed: deckConstructed,
@@ -111,9 +112,9 @@ export class DeckComponent {
         this.deckName = deck.name;
     }
 
-    getDeckCards() {
-        this._deckService.getDeckCards();
-    }
+    //getDeckCards() {
+    //    this._deckService.getDeckCards();
+    //}
 
     getDeckDetails(deckOwner: string, deckName: string) {
         this._deckService.getDeckDetails(deckOwner, deckName);
@@ -128,7 +129,7 @@ export class DeckComponent {
         sideboard ? card.numberInSideboard-- : card.numberInDeck--;
         this._deckService.decrementDeckCard(card, sideboard);
         if (card.numberInDeck == 0 || card.numberInSideboard == 0) {
-            this.getDeckCards();
+            this._deckService.removeCardFromDeck(card);
         }
     }
 
@@ -142,7 +143,6 @@ export class DeckComponent {
 
     removeCardFromDeck(card: DeckCard) {
         this._deckService.removeCardFromDeck(card);
-        this.getDeckCards();
     }
 
     getCard(name: string) {
@@ -154,8 +154,6 @@ export class DeckComponent {
     }
 
     addMetaDeck() {
-
-
         this._deckService.addMetaDeck(this.newMetaDeck);
         this.newMetaDeck = {} as MetaDeck;
     }

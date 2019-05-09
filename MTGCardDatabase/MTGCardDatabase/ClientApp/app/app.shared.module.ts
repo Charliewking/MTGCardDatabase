@@ -19,6 +19,7 @@ import { CardTextPipe } from './pipes/card-text.pipe';
 import { CardRarityPipe } from './pipes/card-rarity.pipe';
 import { CMCSortPipe } from './pipes/card-cmc.pipe';
 import { PlayerSortPipe } from './pipes/player-winrate.pipe';
+import { TrackerRowSortPipe } from './pipes/tracker-row.pipe';
 
 @NgModule({
     declarations: [
@@ -33,7 +34,8 @@ import { PlayerSortPipe } from './pipes/player-winrate.pipe';
         CardTextPipe,
         CardRarityPipe,
         CMCSortPipe,
-        PlayerSortPipe
+        PlayerSortPipe,
+        TrackerRowSortPipe
     ],
     imports: [
         CommonModule,

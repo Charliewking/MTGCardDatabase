@@ -51,14 +51,15 @@
             </tbody>
         </table>
         <!--<select class="form-control" [(ngModel)]="deckOwner" (change)="getDecks(deckOwner)">
-            <option *ngFor="let player of _deckService.players" value="{{player.name}}">{{player.name}}</option>
-        </select>-->
-        <input type="text" [(ngModel)]="deckName" placeholder="New Deck Name" *ngIf="selectedPlayer != ''">
+        <option *ngFor="let player of _deckService.players" value="{{player.name}}">{{player.name}}</option>
+    </select>-->
+        <input class="form-control" style="width:300px;" type="text" [(ngModel)]="deckName" placeholder="New Deck Name" *ngIf="selectedPlayer != ''">
         <span *ngIf="selectedPlayer != ''">
             Constructed Deck?
             <input type="checkbox" [(ngModel)]="deckConstructed">
         </span>
-        <button [disabled]="!deckOwner || !deckName" class="btn" (click)="createNewDeck()" *ngIf="selectedPlayer != ''">Create Deck</button>
+        <button [disabled]="deckName == '' || selectedPlayer == ''" class="btn btn-secondary" (click)="createNewDeck()" *ngIf="selectedPlayer != ''">Create Deck</button>
+        <!--[disabled]="!deckOwner || !deckName"-->
     </div>
     <div class="col-sm-6">
         <ul class="list-group" style="max-height:200px;overflow:auto;">
@@ -67,8 +68,8 @@
                 <!-- [ngClass]="[(deckName == deck.name) ? 'selectedDeck' : '']" -->
                 <a style="float:left;text-decoration:none;" (click)="setSelectedDeck(deck)"><h4 style="margin-top:2px;">{{deck.name}} (Bo1: {{deck.bo1Wins}}-{{deck.bo1Losses}} Bo3: {{deck.bo3Wins}}-{{deck.bo3Losses}})</h4></a>
                 <button style="float:left;" type="button" class="btn btn-default" (click)="_deckService.showRenamebox = deck.name"><i class="glyphicon-pencil"></i></button>
-                <input type="text" *ngIf="_deckService.showRenamebox == deck.name" (keyup.enter)="_deckService.renameDeck(deck, deckRename)" placeholder="{{deck.name}}" [(ngModel)]="deckRename" />
-                <button style="float:left;" *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-default" (click)="_deckService.renameDeck(deck, deckRename)">Rename</button>
+                <input class="form-control" type="text" *ngIf="_deckService.showRenamebox == deck.name" (keyup.enter)="_deckService.renameDeck(deck, deckRename)" placeholder="{{deck.name}}" [(ngModel)]="deckRename" />
+                <button style="float:left;" *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-secondary" (click)="_deckService.renameDeck(deck, deckRename)">Rename</button>
                 <button *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-default" (click)="_deckService.showRenamebox = ''"><i class="glyphicon-pencil"></i></button>
                 <button style="float:right;" *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-success" (click)="_deckService.duplicateDeck(deck)">Duplicate Deck</button>
                 <button style="float:right;" *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-danger" (click)="removeDeck(deck)">Delete Deck</button>
@@ -81,35 +82,46 @@
 
 <div class="row">
     <div class="col-sm-6" *ngIf="_deckService.selectedDeck.name != ' '">
-        <input type="text" (keyup.enter)="getCard(setQuery)" [(ngModel)]="setQuery" id="search" placeholder="Search for a Card">
-        <button (click)="getCard(setQuery)" class="btn">Search Cards</button>
-        <div class="row" style="margin-top:15px;" *ngFor="let card of scryfallService.returnCards | cardNameFilter: queryString">
-            <div class="card mb-3" style="margin-bottom:25px;">
-                <div class="row no-gutters">
-                    <div class="col-sm-4 col-md-4">
-                        <img style="min-width:150px;" src={{card.image_Normal}} class="card-img" alt={{card.name}}>
+        <div class="row" style="margin-bottom:5%;">
+            <div class="col-md-12">
+                <textarea cols="80" type="text" class="form-control" placeholder="Notes on the Deck" [(ngModel)]="_deckService.selectedDeck.notes"></textarea>
+                <button class="btn btn-secondary" (click)="_deckService.submitDeckNotes(_deckService.selectedDeck)">Update Deck Notes</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input style="width:300px;" class="form-control" type="text" (keyup.enter)="getCard(setQuery)" [(ngModel)]="setQuery" id="search" placeholder="Search for a Card">
                     </div>
-                    <div class="col-sm-8 col-md-8 pull-left">
-                        <div class="card-body">
-                            <h3 class="card-title">{{card.name}}</h3>
-                            <span class="mana" *ngFor="let mana of card.full_cost" style="margin-bottom:5px;">
-                                <p style="position:absolute;margin-left:1px;margin-top:1px;" *ngIf="isDigit(mana)">{{mana}}</p>
-                                <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
-                            </span>
-                            <p class="card-text">{{card.card_Text}}</p>
-                            <p class="card-text"></p>
-                            <a (click)="addCardToDeck(card)" class="btn btn-primary">Add to Deck</a>
-                            <a (click)="addCardToSideboard(card)" class="btn btn-primary">Add to Sideboard</a>
+                    <div class="col-md-6">
+                        <button (click)="getCard(setQuery)" class="btn btn-secondary">Search Cards</button>
+                    </div>
+                </div>
+                <div class="row" style="margin-top:15px;" *ngFor="let card of scryfallService.returnCards | cardNameFilter: queryString">
+                    <div class="card mb-3" style="margin-bottom:25px;">
+                        <div class="row no-gutters">
+                            <div class="col-sm-4 col-md-4">
+                                <img style="min-width:150px;" src={{card.image_Normal}} class="card-img" alt={{card.name}}>
+                            </div>
+                            <div class="col-sm-8 col-md-8 pull-left">
+                                <div class="card-body">
+                                    <h3 class="card-title">{{card.name}}</h3>
+                                    <span class="mana" *ngFor="let mana of card.full_cost" style="margin-bottom:5px;">
+                                        <p style="position:absolute;margin-left:1px;margin-top:1px;" *ngIf="isDigit(mana)">{{mana}}</p>
+                                        <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
+                                    </span>
+                                    <p class="card-text">{{card.card_Text}}</p>
+                                    <p class="card-text"></p>
+                                    <a (click)="addCardToDeck(card)" class="btn btn-primary">Add to Deck</a>
+                                    <a (click)="addCardToSideboard(card)" class="btn btn-primary">Add to Sideboard</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="col-md-6">
-            <textarea cols="80" type="text" placeholder="Notes" [(ngModel)]="_deckService.selectedDeck.notes"></textarea>
-        </div>
-
     </div>
     <div class="col-sm-6">
         <div class="row" *ngIf="_deckService.selectedDeck.name != ' '">
@@ -231,42 +243,44 @@
         </select>
     </div>
     <div class="col-md-1">
-        <input type="text" [(ngModel)]="_deckService.deckTrackerRow.rank" placeholder="Current Rank"/>
+        <input class="form-control" type="text" [(ngModel)]="_deckService.deckTrackerRow.rank" placeholder="Current Rank"/>
     </div>
     <div class="col-md-6">
-        <textarea cols="80" type="text" placeholder="Notes" [(ngModel)]="_deckService.deckTrackerRow.notes"></textarea>
+        <textarea cols="80" type="text" class="form-control" placeholder="Notes" [(ngModel)]="_deckService.deckTrackerRow.notes"></textarea>
     </div>
     <div class="col-md-1">
-        <button class="btn btn-info" (disabled)="metaDeck.deckTypeName = ''" (click)="_deckService.addDeckTrackerRow()">Submit Result</button>
+        <button class="btn btn-secondary" (disabled)="metaDeck.deckTypeName = ''" (click)="_deckService.addDeckTrackerRow()">Submit Result</button>
     </div>
 </div>
 
 <div class="row" *ngIf="_deckService.deckTrackerRow.playedAgainst == 'AddNewMetaDeck'">
     <div class="col-md-1">
-        <input type="text" placeholder="Meta Deck Name" [(ngModel)]="newMetaDeck.deckTypeName"/>
+        <input class="form-control" type="text" placeholder="Meta Deck Name" [(ngModel)]="newMetaDeck.deckTypeName"/>
     </div>
     <div class="col-md-1">
-        <button class="btn btn-info" (disabled)="newMetaDeck.deckTypeName == ''" (click)="addMetaDeck()">Submit New Meta</button>
+        <button class="btn btn-secondary" (disabled)="newMetaDeck.deckTypeName == ''" (click)="addMetaDeck()">Submit New Meta</button>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <table class="table table-striped" *ngIf="_deckService.selectedDeck.name != ' '">
+<div class="row" style="max-height:300px;overflow:auto;">
+    <div class="col-md-12" >
+        <table class="table table-striped" *ngIf="_deckService.selectedDeck.name != ' '"> 
             <thead>
                 <tr>
                     <th>Played</th>
                     <th>Format</th>
                     <th>Result</th>
                     <th>Notes</th>
+                    <th>TimeStamp</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let record of _deckService.selectedDeck.trackerRows">
+                <tr *ngFor="let record of _deckService.selectedDeck.trackerRows | trackerRowSort; let i = index">
                     <td>{{record.playedAgainst}}</td>
                     <td>{{record.format}}</td>
                     <td>{{record.result}}</td>
                     <td>{{record.notes}}</td>
+                    <td>{{record.rowKey}}</td>
                 </tr>
             </tbody>
         </table>

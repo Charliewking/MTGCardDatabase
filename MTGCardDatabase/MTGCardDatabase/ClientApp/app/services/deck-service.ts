@@ -62,17 +62,17 @@ export class DeckService {
         return this.selectedDeck;
     }
 
-    getDeckCards() {
-        this.http.get(this._baseUrl + 'api/decks/cards/' + this.selectedDeck.owner + '_' + this.selectedDeck.name).subscribe(result => {
-            this.successText = "Cards Retrieved Successfully";
-            this.deckCards = result.json();
-            this.deckOwner = this.selectedDeck.owner;
-            this.deckName = this.selectedDeck.name;
-            this.getDeckDetails(this.deckOwner, this.deckName);
-        }, error => {
-            alert(error.json());
-        });
-    }
+    //getDeckCards() {
+    //    this.http.get(this._baseUrl + 'api/decks/cards/' + this.selectedDeck.name + '_' + this.selectedDeck.name).subscribe(result => {
+    //        this.successText = "Cards Retrieved Successfully";
+    //        this.deckCards = result.json();
+    //        this.deckOwner = this.selectedDeck.owner;
+    //        this.deckName = this.selectedDeck.name;
+    //        this.getDeckDetails(this.deckOwner, this.deckName);
+    //    }, error => {
+    //        alert(error.json());
+    //    });
+    //}
 
     setSelectedDeck(deck: Deck) {
         this.selectedDeck = deck;
@@ -82,13 +82,11 @@ export class DeckService {
     addDeck(deck: Deck) {
 
         return this.http.post(this._baseUrl + 'api/decks/addDeck', deck)
-            .subscribe(data => { }, error => {
+            .subscribe(() => {
+                this.getDecks(deck.owner);
+            }, error => {
                 alert(error.json());
-            },
-                () => {
-                    this.getDecks(deck.owner);
-                }
-            );
+            });
     }
 
     duplicateDeck(deck: Deck) {
@@ -210,11 +208,12 @@ export class DeckService {
     addDeckTrackerRow() {
 
         this.deckTrackerRow.owner = this.selectedDeck.owner;
-        this.deckTrackerRow.deckName = this.selectedDeck.name;
+        this.deckTrackerRow.deckName = this.selectedDeck.rowKey;
 
         return this.http.post(this._baseUrl + 'api/decks/deckTracker', this.deckTrackerRow)
             .subscribe(() => {
-                this.selectedDeck.trackerRows.push(this.deckTrackerRow);
+                this.selectedDeck.trackerRows.unshift(this.deckTrackerRow);
+
                 this.deckTrackerRow = {} as DeckTrackerRow;
             }, error => {
                 alert(error.json());
@@ -244,11 +243,20 @@ export class DeckService {
             });
     }
 
+    submitDeckNotes(deck: Deck) {
+        this.http.post(this._baseUrl + 'api/decks/addNotes', deck)
+            .subscribe(() => {
+                
+            }, error => {
+                alert(error.json());
+            });
+    }
+
     createDeckCard(card: Card) {
 
         let deckCard = {
             owner: this.selectedDeck.owner,
-            deckName: this.selectedDeck.name,
+            deckName: this.selectedDeck.rowKey,
             cardName: card.name,
             cardSet: card.set_Short,
             mana_Cost: card.mana_Cost,
