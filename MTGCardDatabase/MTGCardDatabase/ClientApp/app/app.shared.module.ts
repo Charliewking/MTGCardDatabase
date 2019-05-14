@@ -6,7 +6,7 @@ import { RouterModule } from '@angular/router';
 
 import { HttpCardService } from './services/http-service';
 import { DeckService } from './services/deck-service';
-
+import { ScryfallService } from './services/scryfall.service';
 import { AppComponent } from './components/app/app.component';
 import { NavMenuComponent } from './components/navmenu/navmenu.component';
 import { ManaCostComponent } from './components/manacost/manacost.component';
@@ -20,6 +20,7 @@ import { CardRarityPipe } from './pipes/card-rarity.pipe';
 import { CMCSortPipe } from './pipes/card-cmc.pipe';
 import { PlayerSortPipe } from './pipes/player-winrate.pipe';
 import { TrackerRowSortPipe } from './pipes/tracker-row.pipe';
+import { NotificationComponent } from './components/notification/notification.component';
 
 @NgModule({
     declarations: [
@@ -30,6 +31,7 @@ import { TrackerRowSortPipe } from './pipes/tracker-row.pipe';
         DeckComponent,
         CollectionComponent,
         PreviewComponent,
+        NotificationComponent,
         CardNamePipe,
         CardTextPipe,
         CardRarityPipe,
@@ -50,7 +52,7 @@ import { TrackerRowSortPipe } from './pipes/tracker-row.pipe';
             { path: '**', redirectTo: 'collection' }
         ])
     ],
-    providers: [HttpCardService, DeckService]
+    providers: [HttpCardService, DeckService, ScryfallService]
 })
 export class AppModuleShared {
 }

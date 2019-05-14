@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <None Remove="ClientApp\app\components\manacost\manacost.component.ts" />
+    <None Remove="ClientApp\app\components\notification\notification.component.ts" />
     <None Remove="ClientApp\app\components\preview\preview.component.ts" />
     <None Remove="ClientApp\app\interfaces\interfaces.ts" />
     <None Remove="ClientApp\app\pipes\card-cmc.pipe.ts" />
@@ -37,6 +38,7 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\app\components\manacost\manacost.component.ts" />
+    <TypeScriptCompile Include="ClientApp\app\components\notification\notification.component.ts" />
     <TypeScriptCompile Include="ClientApp\app\components\preview\preview.component.ts" />
     <TypeScriptCompile Include="ClientApp\app\interfaces\interfaces.ts" />
     <TypeScriptCompile Include="ClientApp\app\pipes\card-cmc.pipe.ts" />

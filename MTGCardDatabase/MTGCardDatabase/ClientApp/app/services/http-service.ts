@@ -8,6 +8,7 @@ export class HttpCardService {
     private _baseUrl = '';
     public cards: Card[] = [];
     public collectionValue: string = '';
+    public errorText: string = '';
 
     constructor(private http: Http, @Inject('BASE_URL') baseUrl: string) {
         this._baseUrl = baseUrl;
@@ -33,6 +34,7 @@ export class HttpCardService {
 
         return this.http.post(this._baseUrl + 'api/cards/addCard', card)
             .subscribe(error => {
+                this.errorText = "The Card already exists in the collection.";
                 alert(error.json());
             });
     }
@@ -45,6 +47,7 @@ export class HttpCardService {
 
         return this.http.post(this._baseUrl + 'api/cards/removeCard', deleteCard)
             .subscribe(data => { }, error => {
+                this.errorText = "The Card was not successfully removed from the Collection.";
                 alert(error.json());
             });
     }
@@ -58,6 +61,7 @@ export class HttpCardService {
 
         return this.http.post(this._baseUrl + 'api/cards/increment', plusCard)
             .subscribe(data => { }, error => {
+                this.errorText = "Error incrementing the card.";
                 alert(error.json());
             });
     }
@@ -71,6 +75,7 @@ export class HttpCardService {
 
         return this.http.post(this._baseUrl + 'api/cards/decrement', plusCard)
             .subscribe(data => { }, error => {
+                this.errorText = "Error decrementing the card.";
                 alert(error.json());
             });
     }

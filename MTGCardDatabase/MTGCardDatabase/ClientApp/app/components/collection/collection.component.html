@@ -79,18 +79,56 @@
         </div>
     </div>-->
 
+    <notification *ngIf="_httpCardService.errorText != ''" [alert]="_httpCardService.errorText" ></notification>
 
     <div class="row">
-        <div class="col-sm-3 col-md-3 col-lg-2" *ngFor="let card of _httpCardService.cards | cardRarityFilter: rarityString | cardTextFilter: queryString; let i = index">
+        <div class="col-xs-2 col-sm-3 col-md-3 col-lg-2" *ngFor="let card of _httpCardService.cards | cardRarityFilter: rarityString | cardTextFilter: queryString; let i = index">
             <div class="card" style="width:18rem;margin:5%;">
                 <img class="card-img-top" style="background-color:transparent;" src={{card.image_Normal}} alt="Card image cap">
                 <div class="card-body">
-                    <h5 class="card-title">{{card.name}}</h5>
-                    <mana-cost [mana]="card.mana_Cost"></mana-cost>
+                    <div class="row" style="margin-left:1%;">
+                        <h5 class="card-title">{{card.name}}</h5>
+                    </div>
+                    <div class="row" style="margin-left:2%;">
+                        <mana-cost style="margin-right:10px;" [mana]="card.mana_Cost"></mana-cost>
+                        <h4 style="margin-top: 4px;"> ${{card.price}}</h4>
+                    </div>
+                    <div class="row" style="margin-left:2%;">
+                        <a (click)="incrementCardCount(card)" class="btn">+</a>
+                        <h4 style="margin-top: 4px;">{{ card.numberInCollection }}</h4>
+                        <a (click)="decrementCardCount(card)" class="btn">-</a>
+                    </div>
                     <!--<p class="card-text">{{card.card_Text}}</p>-->
-                    <h4 style="float:left;margin-right:10px;font-weight:bolder;">{{ card.numberInCollection }} - ${{card.price}}</h4>
-                    <br />
-                    <button style="margin:auto;" (click)="addCard(card)" class="btn">Add to Deck</button>
+                    <!--<br />-->
+                    <!--<button style="margin:auto;" (click)="addCard(card)" class="btn">Add to Deck</button>-->
+                </div>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-success" (click)="_scryfallService.getCard(queryString)">Search For Card on Scryfall</button>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row" style="margin-top:15px;" *ngFor="let card of scryfallService.returnCards">
+                    <div class="card mb-3" style="margin-bottom:25px;">
+                        <div class="row no-gutters">
+                            <div class="col-sm-4 col-md-4">
+                                <img style="width:150px;" src={{card.image_Normal}} class="card-img" alt={{card.name}}>
+                            </div>
+                            <div class="col-sm-8 col-md-8 pull-left">
+                                <div class="card-body">
+                                    <h3 class="card-title">{{card.name}}</h3>
+                                    <span class="mana" *ngFor="let mana of card.full_cost" style="margin-bottom:5px;">
+                                        <p style="position:absolute;margin-left:1px;margin-top:1px;" *ngIf="isDigit(mana)">{{mana}}</p>
+                                        <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
+                                    </span>
+                                    <p class="card-text">{{card.card_Text}}</p>
+                                    <p class="card-text"></p>
+                                    <a (click)="addCard(card)" class="btn btn-primary">Add to Collection</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

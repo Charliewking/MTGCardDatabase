@@ -47,11 +47,15 @@ interface ScryfallCard {
     set_name: string;
     oracle_text: string;
     card_faces: CardFace[];
-    usd: string;
+    prices: Prices;
 }
 
 interface CardFace {
     oracle_text: string;
+}
+
+interface Prices {
+    usd: string;
 }
 
 interface DeckTrackerRow {
