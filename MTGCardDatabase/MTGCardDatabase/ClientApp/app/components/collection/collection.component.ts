@@ -1,23 +1,27 @@
 import { Component, Inject } from '@angular/core';
 import { HttpCardService } from '../../services/http-service';
-import { CardNamePipe } from '../../pipes/card-name.pipe';
+import { ScryfallService } from '../../services/scryfall.service';
 import { DeckService } from '../../services/deck-service';
 import { Card } from '../../interfaces/interfaces';
 
+
 @Component({
     selector: 'collection',
-    templateUrl: './collection.component.html'
+    templateUrl: './collection.component.html',
+    styleUrls: ['./collection.component.css'],
+    providers: [HttpCardService, ScryfallService]
 })
 export class CollectionComponent {
     public cards: Card[] = [];
 
     public _httpCardService: HttpCardService;
     public _deckService: DeckService;
+    public _scryfallService: ScryfallService;
 
     public rarityString: string = '';
     public queryString: string = '';
     public collectionValue: string = '';
-
+    public errorText: string = '';
     public filterString: string = '';
 
     public filterOn: boolean = false;
@@ -37,9 +41,10 @@ export class CollectionComponent {
         });
     }
 
-    constructor(private httpCardService: HttpCardService, private deckService: DeckService) {
-        this._httpCardService = httpCardService;
+    constructor(private deckService: DeckService, private cardService: HttpCardService, private scryfallService: ScryfallService) {
+        this._httpCardService = cardService;
         this._deckService = deckService;
+        this._scryfallService = scryfallService;
     }
 
     setFilter(filterColor: string) {
@@ -113,6 +118,7 @@ export class CollectionComponent {
 
     addCard(card: Card) {
         //this._deckService.addCardToDeck('Charlie_Saprolings', card.name, card.set_Short);
+        this._httpCardService.addCard(card);
     }
 
     removeCard(card: Card) {
@@ -169,8 +175,6 @@ export class CollectionComponent {
             return 'grey'
         }
     }
-
-
 
     removeColor(color: string) {
         this.filters.forEach((item, index) => {

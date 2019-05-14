@@ -47,15 +47,20 @@ interface ScryfallCard {
     set_name: string;
     oracle_text: string;
     card_faces: CardFace[];
-    usd: string;
+    prices: Prices;
 }
 
 interface CardFace {
     oracle_text: string;
 }
 
+interface Prices {
+    usd: string;
+}
+
 interface DeckTrackerRow {
     owner: string;
+    rowKey: string;
     deckName: string;
     playedAgainst: string;
     rank: string;
@@ -65,6 +70,7 @@ interface DeckTrackerRow {
 }
 
 interface Deck {
+    rowKey: string;
     owner: string;
     name: string;
     color1: string;

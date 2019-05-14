@@ -25,23 +25,27 @@
 
   <ItemGroup>
     <None Remove="ClientApp\app\components\manacost\manacost.component.ts" />
+    <None Remove="ClientApp\app\components\notification\notification.component.ts" />
     <None Remove="ClientApp\app\components\preview\preview.component.ts" />
     <None Remove="ClientApp\app\interfaces\interfaces.ts" />
     <None Remove="ClientApp\app\pipes\card-cmc.pipe.ts" />
     <None Remove="ClientApp\app\pipes\card-rarity.pipe.ts" />
     <None Remove="ClientApp\app\pipes\card-text.pipe.ts" />
     <None Remove="ClientApp\app\pipes\player-winrate.pipe.ts" />
+    <None Remove="ClientApp\app\pipes\tracker-row.pipe.ts" />
     <None Remove="ClientApp\app\styles\mana-cost.ts" />
   </ItemGroup>
 
   <ItemGroup>
     <TypeScriptCompile Include="ClientApp\app\components\manacost\manacost.component.ts" />
+    <TypeScriptCompile Include="ClientApp\app\components\notification\notification.component.ts" />
     <TypeScriptCompile Include="ClientApp\app\components\preview\preview.component.ts" />
     <TypeScriptCompile Include="ClientApp\app\interfaces\interfaces.ts" />
     <TypeScriptCompile Include="ClientApp\app\pipes\card-cmc.pipe.ts" />
     <TypeScriptCompile Include="ClientApp\app\pipes\card-rarity.pipe.ts" />
     <TypeScriptCompile Include="ClientApp\app\pipes\card-text.pipe.ts" />
     <TypeScriptCompile Include="ClientApp\app\pipes\player-winrate.pipe.ts" />
+    <TypeScriptCompile Include="ClientApp\app\pipes\tracker-row.pipe.ts" />
     <TypeScriptCompile Include="ClientApp\app\styles\mana-cost.ts" />
   </ItemGroup>
 

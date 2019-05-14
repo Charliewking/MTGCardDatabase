@@ -39,6 +39,7 @@ namespace MTGCardDatabase
                 options.metaDecksTableName = Configuration["TableNames:metaDeckTable"];
                 options.deckVersusMetaDeckTable = Configuration["TableNames:deckVersusMetaDeckTable"];
                 options.playerTableName = Configuration["TableNames:playerTableName"];
+                options.cubeTableName = Configuration["TableNames:cubeTableName"];
             });
         }
 

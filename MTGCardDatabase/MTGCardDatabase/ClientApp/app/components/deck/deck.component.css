@@ -30,3 +30,7 @@
     background-color: #dddddd;
     cursor: pointer;
 }
+
+img {
+    border-radius: calc(1.7rem - 3px) !important;
+}

@@ -85,8 +85,14 @@ namespace MTGDatabase.Controllers
         {
             card.PartitionKey = card.Set_Short;
             card.RowKey = card.Name.Replace(" // ", " ");
-
-            await GetCloudTable(_config.cardTableName).ExecuteAsync(TableOperation.Insert(card));
+            try
+            {
+                await GetCloudTable(_config.cardTableName).ExecuteAsync(TableOperation.Insert(card));
+            }
+            catch(Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
         }
 
         [Route("removeCard")]
