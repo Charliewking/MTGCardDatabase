@@ -8,6 +8,7 @@ import { Card } from '../../interfaces/interfaces';
 @Component({
     selector: 'collection',
     templateUrl: './collection.component.html',
+    styleUrls: ['./collection.component.css'],
     providers: [HttpCardService, ScryfallService]
 })
 export class CollectionComponent {

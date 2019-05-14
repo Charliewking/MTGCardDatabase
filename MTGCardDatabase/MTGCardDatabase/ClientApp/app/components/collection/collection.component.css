@@ -1,0 +1,6 @@
+﻿.card-img-top {
+    min-width: 200px;
+    max-width: 400px;
+    background-color: rgba(0,0,0,.2) !important;
+    border-radius: 4% !important;
+}
