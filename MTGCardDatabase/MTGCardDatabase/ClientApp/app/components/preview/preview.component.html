@@ -1,6 +1,6 @@
 ﻿
 
-<div style="background-color:#00FF00;">
+<div style="background-color:#00FF00;font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif">
     <!--<div class="col-md-2">
         <ul class="list-group">
             <li class="list-group-item" *ngFor="let card of cards">
@@ -10,40 +10,72 @@
 
     </div>-->
 
-    <div style="position:relative;margin-bottom:30px;">
+    <div style="position:relative;margin-bottom:20px;">
         <div id="myCarousel" class="carousel slide" data-interval="false">
             <!-- Indicators -->
             <!--<ol class="carousel-indicators">
                 <li data-target="#myCarousel" *ngFor="let x of cards;let i = index" [attr.data-slide-to]="i" ngClass="i == 0 ? 'active' : ''"></li>
             </ol>-->
             <!-- Wrapper for slides -->
-            <div *ngIf="_scryfallService.returnCards[0]" class="carousel-inner" role="listbox">
+            <div *ngIf="previewCardName != ' ' " class="carousel-inner" role="listbox">
                 <div class="row">
                     <div class="col-md-6">
-                        <h1 style="color:white;margin-left:45px;margin-top:65%;margin-bottom:5%">
-                            {{scryfallService.returnCards[0].name}}
+                        <h1 style="font-family:'Palatino Linotype';color:#fff;font-size:6em;font-weight:bold;margin-left:45px;margin-top:10%;margin-bottom:5%;">
+                            <!-- -webkit-text-stroke: 1px #fff;-->
+                            {{strings.previewCardName}}
                         </h1>
                         <div class="row">
                             <div class="col-md-1">
                                 <h3> </h3>
                             </div>
                             <div class="col-md-4">
-                                <h3 *ngIf="MPScore" style="color:#a2cf99">@_MediaPlay</h3>
-                                <h1 style="text-align:center;color:#a2cf99;">{{MPScore}}</h1>
+                                <h1 style="text-align:center;color:black;font-size:5em;font-weight:bold;-webkit-text-stroke: 1px #fff;">{{strings.host1}}</h1>
+                                <h1 style="text-align:center;color:black;font-size:5em;font-weight:bold;-webkit-text-stroke: 1px #fff;">{{strings.rating1}}</h1>
                             </div>
-                            <div class="col-md-4">
-                                <h3 *ngIf="MPScore" style="color:#a2cf99">@_Ironstream</h3>
-                                <h1 *ngIf="MPScore" style="text-align:center;color:#a2cf99;">{{ISScore}}</h1>
+                            <div class="col-md-4" style="margin-bottom:100px;">
+                                <h1 style="text-align:center;color:black;font-size:5em;font-weight:bold;-webkit-text-stroke: 1px #fff;">{{strings.host2}}</h1>
+                                <h1 style="text-align:center;color:black;font-size:5em;font-weight:bold;-webkit-text-stroke: 1px #fff;">{{strings.rating2}}</h1>
                             </div>
                         </div>
-                        <div class="row">
-                            <h1 *ngIf="MPScore" style="text-align:center;color:#a2cf99;margin-right:17%;">{{TotalScore}}</h1>
+                        <!--<div class="row">
+        <h1 *ngIf="MPScore" style="text-align:center;color:#a2cf99;font-size:5em;font-weight:bold;margin-right:17%;">{{TotalScore}}</h1>
+    </div>-->
+
+
+                        <input (keyup.enter)="getCard(setQuery)" type="text" [(ngModel)]="setQuery" id="search" placeholder="Search for a Card">
+                        <button (click)="getCard(setQuery)" class="btn">Search Cards</button>
+
+                        <input (keyup.enter)="setMPScore()" type="text" [(ngModel)]="MPScore" id="search" placeholder="MediaPlay Score">
+                        <input (keyup.enter)="setISScore()" type="text" [(ngModel)]="ISScore" id="search" placeholder="IronStream Score">
+
+                        <select [(ngModel)]="rarityString" value="Rarity" name="rarityQuery">
+                            <option value="">Select Rarity</option>
+                            <option value="mythic">Mythic</option>
+                            <option value="rare">Rare</option>
+                            <option value="uncommon">Uncommon</option>
+                            <option value="common">Common</option>
+                        </select>
+
+                        <input type="text" id="searchCollection1" [(ngModel)]="queryString" placeholder="Search Collection" name="searchQuery">
+
+                        <div style="max-height:200px;overflow:auto;">
+                            <div *ngFor="let card of _httpCardService.previewCards | cardRarityFilter: rarityString | cardNameFilter: queryString; let i = index">
+                                <a (click)="setPreviewCard(card)">{{card.name}}</a>
+                            </div>
                         </div>
+
+
                     </div>
                     <div class="col-md-4">
-                        <img style="margin-left:auto;margin-right:auto;margin-top:30px;border-radius:25px;" src={{scryfallService.returnCards[0].image_Normal}} alt="Event Image">
+                        <img style="margin-left:auto;margin-right:auto;margin-top:30px;margin-bottom:30px;font-size:5em;font-weight:bold;border-radius:25px;" src={{strings.previewCardURI}} alt="Event Image">
                     </div>
                 </div>
+            </div>
+
+            <div>
+                <button (click)="intialPreviewCardSet(strings.setName)">
+                    Set Up Initial Preview Cards
+                </button>
             </div>
 
             <!-- Left and right controls -->
@@ -59,14 +91,5 @@
     </div>
 
 </div>
-
-
-<input (keyup.enter)="getCard(setQuery)" type="text" [(ngModel)]="setQuery" id="search" placeholder="Search for a Card">
-<button (click)="getCard(setQuery)" class="btn">Search Cards</button>
-
-<input (keyup.enter)="setMPScore()" type="text" [(ngModel)]="MPScore" id="search" placeholder="MediaPlay Score">
-<input (keyup.enter)="setISScore()" type="text" [(ngModel)]="ISScore" id="search" placeholder="IronStream Score">
-
-
 
 

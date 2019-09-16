@@ -23,6 +23,7 @@ export class CollectionComponent {
     public collectionValue: string = '';
     public errorText: string = '';
     public filterString: string = '';
+    public addCardCount: number = 1;
 
     public filterOn: boolean = false;
     public redFilter: boolean = false;
@@ -36,9 +37,9 @@ export class CollectionComponent {
     ngOnInit() {
         // call some function that gets either a cache or new cards if no cache
         this._httpCardService.getCards();
-        this._httpCardService.getCollectionValue().subscribe(result => {
-            this.collectionValue = result.json();
-        });
+        //this._httpCardService.getCollectionValue().subscribe(result => {
+        //    this.collectionValue = result.json();
+        //});
     }
 
     constructor(private deckService: DeckService, private cardService: HttpCardService, private scryfallService: ScryfallService) {
@@ -116,9 +117,14 @@ export class CollectionComponent {
         this.cards = this._httpCardService.cards
     }
 
-    addCard(card: Card) {
+    addCard(card: Card, count: number) {
         //this._deckService.addCardToDeck('Charlie_Saprolings', card.name, card.set_Short);
-        this._httpCardService.addCard(card);
+        //if (count < 0) {
+            this._httpCardService.addCard(card, count);
+        //}
+        //else {
+          //  this._httpCardService.errorText = "Cannot add 0 or negative numbered amounts of cards";
+        //}
     }
 
     removeCard(card: Card) {

@@ -12,7 +12,7 @@ export class ScryfallService {
 
     constructor(private http: Http) { }
 
-    getCards(set: string) {
+    getSet(set: string) {
         return this.http.get(this._baseUrl + 'search?q=set:' + set);
     }
 
@@ -59,6 +59,11 @@ export class ScryfallService {
         error => {
             return (error.json()).details;
         });
+    }
+
+    returnCard(name: string) {
+        name = name.replace(' ', '+');
+        return this.http.get(this._baseUrl + "named?fuzzy=" + name);
     }
 
     getNewPage(url: string) {

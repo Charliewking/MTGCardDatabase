@@ -5,16 +5,18 @@ import { CardTextPipe } from '../../pipes/card-text.pipe';
 import { HttpCardService } from '../../services/http-service';
 import { ScryfallService } from '../../services/scryfall.service';
 import { Card, PreviewCard } from '../../interfaces/interfaces';
+import { PreActivation } from '@angular/router/src/router';
 
 @Component({
-    selector: 'preview',
-    templateUrl: './preview.component.html',
+    selector: 'cardeval',
+    templateUrl: './cardeval.html',
     providers: [HttpCardService, ScryfallService]
 })
-export class PreviewComponent {
+export class CardEvalComponent {
     public queryString: string = '';
     public setQuery: string = '';
     public cards: Card[] = [];
+    public showError: boolean = false;
 
     public strings = {
         host1: '@_Ironstream',
@@ -30,9 +32,6 @@ export class PreviewComponent {
         setName: 'eld',
         errorText: "Not enough to search on",
     }
-
-    public previewCards: PreviewCard[] = [];
-    public nextPage: string = '';
 
     public _httpCardService: HttpCardService;
     public _scryfallService: ScryfallService;
@@ -65,48 +64,22 @@ export class PreviewComponent {
 
     setPreviewCard(previewCard: PreviewCard) {
         this.strings.previewCardName = previewCard.name;
+        this.strings.previewCardURI = previewCard.image_Normal;
         this.strings.rating1 = previewCard.rating1;
         this.strings.rating2 = previewCard.rating2;
-        this.strings.previewCardURI = previewCard.image_Normal;
-        this.strings.comment1 = previewCard.comment1;
-        this.strings.comment2 = previewCard.comment2;
     }
 
-    getSet(set: string) {
-        let jsonReturnData: PreviewCard[] = [];
-        let jsonReturnData2: PreviewCard[] = [];
-        this._scryfallService.getSet(set).subscribe(result => {
-            this.nextPage = (result.json()).next_page;
-            jsonReturnData = (result.json()).data;
-            if (this.nextPage) {   
-                this._scryfallService.getNewPage(this.nextPage).subscribe(result => {
-                    jsonReturnData2 = (result.json()).data;
-                    this.previewCards = jsonReturnData.concat(jsonReturnData2);
-                });
-            } else {
-                this.previewCards = jsonReturnData;
-            }
-        });
-        //this._scryfallService.getNewPage(this.nextPage).subscribe(result => {
-        //    jsonReturnData.concat((result.json()).data);
-        //});
-
-        //this.cards = jsonReturnData;
+    submitRating(previewCard: PreviewCard) {
+        this._httpCardService.addPreviewCard(previewCard);
     }
 
-    intialPreviewCardSet(setName: string) {
-        this.getSet(setName)
-        this.previewCards.forEach((previewCard: PreviewCard) => {
-            previewCard.color1 = previewCard.colors[0] || '';
-            previewCard.color2 = previewCard.colors[1] || '';
-            if (previewCard.image_uris.normal) {
-                previewCard.image_Normal = previewCard.image_uris.normal;
-            } else if (previewCard.image_uris.large) {
-                previewCard.image_Normal = previewCard.image_uris.large;
-            } else if (previewCard.image_uris.small) {
-                previewCard.image_Normal = previewCard.image_uris.small;
-            }
-            this._httpCardService.addPreviewCard(previewCard);
-        });
-    }
+    //submitRatings() {
+    //    this._httpCardService.previewCards.forEach((previewCard:) => this.setPreviewCard())
+    //}
+}
+
+
+interface ImageBinding {
+    Name: string;
+    Image_URI: string;
 }

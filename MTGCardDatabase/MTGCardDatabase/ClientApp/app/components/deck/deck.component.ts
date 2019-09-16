@@ -2,7 +2,9 @@ import { Component } from '@angular/core';
 import { DeckService } from '../../services/deck-service'
 import { HttpCardService } from '../../services/http-service'
 import { ScryfallService } from '../../services/scryfall.service';
-import { Card, Deck, MetaDeck, DeckCard } from '../../interfaces/interfaces';
+import { Card, Deck, MetaDeck, DeckCard, ScryfallCard } from '../../interfaces/interfaces';
+import { Subscribable } from 'rxjs/Observable';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
     selector: 'deck',
@@ -97,10 +99,58 @@ export class DeckComponent {
             instantCount: 0,
             enchantmentCount: 0,
             cardCount: 0,
-            sideboardCount: 0
+            sideboardCount: 0,
+            deckQuery: ""
         }
 
         this._deckService.addDeck(deck);
+    }
+
+    createDeckFromString(deck: Deck, deckQuery: string) {
+        deck.deckQuery = deckQuery;
+
+        let regexValue: RegExp = new RegExp(/(\d\D+)/g);
+        //var matchedArray = regexValue.exec(deckQuery);
+        //var cardArray = new Array(matchedArray);
+
+        for (let card = regexValue.exec(deckQuery); card !== null; card = regexValue.exec(deckQuery)) {
+            //alert(card);
+            //var matchIndex = card.index;
+            var count = card[0].toString().substr(0, 1)
+            var name = card[0].toString().substr(2, card.toString().length - 2);
+
+            this.returnCard(name, +count);
+        }
+
+        //this.getDeckDetails(this.selectedPlayer, deck.name);
+    }
+
+    createDeckFromArenaString(deck: Deck, deckQuery: string) {
+        deck.deckQuery = deckQuery;
+
+        let regexValue: RegExp = new RegExp(/(\d\D+\()/g);
+        //var matchedArray = regexValue.exec(deckQuery);
+        //var cardArray = new Array(matchedArray);
+
+        for (let card = regexValue.exec(deckQuery); card !== null; card = regexValue.exec(deckQuery)) {
+            //alert(card);
+            //var matchIndex = card.index;
+            var count = card[0].toString().substr(0, 1)
+            var name = card[0].toString().substr(2, card.toString().length - 3);
+
+            this.returnCard(name, +count);
+        }
+    }
+
+    showRandomHand(deck: Deck) {
+
+        //if (this._deckService.showHand == false) {
+            this._deckService.showHand = true;
+            this.deckService.getRandomHand(deck.owner, deck.name);
+        //}
+        //else {
+        //    this._deckService.showHand = false;
+        //}
     }
 
     removeDeck(deck: Deck) {
@@ -128,17 +178,17 @@ export class DeckComponent {
     decrementDeckCard(card: DeckCard, sideboard: boolean) {
         sideboard ? card.numberInSideboard-- : card.numberInDeck--;
         this._deckService.decrementDeckCard(card, sideboard);
-        if (card.numberInDeck == 0 || card.numberInSideboard == 0) {
-            this._deckService.removeCardFromDeck(card);
-        }
+        //if (card.numberInDeck == 0 && card.numberInSideboard == 0) {
+        //    this._deckService.removeCardFromDeck(card);
+        //}
     }
 
     addCardToDeck(card: Card) {
-        this._deckService.addCardToDeck(card);
+        this._deckService.addCardToDeck(card, 1);
     }
 
     addCardToSideboard(card: Card) {
-        this._deckService.addCardToSideboard(card);
+        this._deckService.addCardToSideboard(card, 1);
     }
 
     removeCardFromDeck(card: DeckCard) {
@@ -147,6 +197,50 @@ export class DeckComponent {
 
     getCard(name: string) {
         this._scryfallService.getCard(name);
+    }
+
+    returnCard(name: string, count: number) {
+        this._scryfallService.returnCard(name).subscribe(result => {
+            var card = result.json() as ScryfallCard;
+
+            let cardData: Card = {
+                set_Short: card.set,
+                name: card.name,
+                color1: card.colors[0] ? card.colors[0] : '',
+                color2: card.colors[1] ? card.colors[1] : '',
+                color3: card.colors[2] ? card.colors[2] : '',
+                color4: card.colors[3] ? card.colors[3] : '',
+                color5: card.colors[4] ? card.colors[4] : '',
+                rarity: card.rarity,
+                power: card.power,
+                toughness: card.toughness,
+                mana_Cost: card.mana_cost,
+                loyalty: card.loyalty,
+                cmc: card.cmc,
+                image_Small: (card.image_uris).small,
+                image_Normal: (card.image_uris).normal,
+                image_Large: (card.image_uris).large,
+                card_Text: card.oracle_text,
+                flavor_Text: card.flavor_text,
+                type_Line: card.type_line,
+                set_Name: card.set_name,
+                full_Cost: [],
+                numberInCollection: 1,
+                price: card.prices.usd
+            };
+
+            if (cardData.name.includes("//")) {
+                cardData.card_Text = card.card_faces[0].oracle_text + " // " + card.card_faces[1].oracle_text
+            }
+
+            cardData.mana_Cost = cardData.mana_Cost.substr(1, (cardData.mana_Cost.length - 2));
+            cardData.full_Cost = cardData.mana_Cost.split("}{");
+
+            this._deckService.addCardToDeck(cardData, count);
+        },
+        error => {
+            return (error.json()).details;
+        });
     }
 
     setSearchQuery(cardName: string) {
@@ -183,56 +277,66 @@ export class DeckComponent {
     }
 
     downloadButtonPush() {
-        var csvData = this.ConvertToCSV(this.deckCards);
+        var csvData = this.ConvertToCSV(this._deckService.selectedDeck.mainDeck, this._deckService.selectedDeck.sideboard);
         var a = document.createElement("a");
         a.setAttribute('style', 'display:none;');
         document.body.appendChild(a);
         var blob = new Blob([csvData], { type: 'text/csv' });
         var url = window.URL.createObjectURL(blob);
         a.href = url;
-        a.download = 'CubeCardList.csv';
+        a.download = 'Decklist.txt';
         a.click();
     }
-    ConvertToCSV(objArray: any): string {
-        var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
+
+    ConvertToCSV(mainDeck: any, sideBoard:any): string {
+        var mainDeckarray = typeof mainDeck != 'object' ? JSON.parse(mainDeck) : mainDeck;
+        var sideBoardArray = typeof sideBoard != 'object' ? JSON.parse(sideBoard) : sideBoard;
         var str = '';
-        var row = "";
+        //var row = "";
 
-        for (var index in objArray[0]) {
-
-            //Now convert each value to string and comma-separated
-            row += index + ',';
-        }
-        row = row.slice(0, -1);
+        //for (var header in objArray[0]) {
+        //    //Now convert each value to string and comma-separated
+        //    row += header + ',';
+        //}
+        //row = row.slice(0, -1);
         //append Label row with line break
-        str += row + '\r\n';
+        //str += row + '\r\n';
 
-        for (var i = 0; i < array.length; i++) {
+        for (var i = 0; i < mainDeckarray.length; i++) {
             var line = '';
-            for (var index in array[i]) {
+            //for (var index in array[i]) {
 
-                var val = '';
+            //    var val = '';
 
-                if (array[i][index]) {
-                    val = array[i][index].toString();
-                    val.replace(',', '');
-                    val.replace("\r\n", " ");
-                    val.replace('"', '');
-                    //array[i][index].replace(',', '');
-                    //array[i][index].replace("\r\n", " ");
-                    //array[i][index].replace('"', '');
-                }
+            //    if (array[i][index]) {
+            //        val = array[i][index].toString();
+            //        val.replace(',', '');
+            //        val.replace("\r\n", " ");
+            //        val.replace('"', '');
+            //    }
 
-                if (index == "flavor_Text" || index == "card_Text") {
-                    val = "";
-                }
+            //    if (index == "flavor_Text" || index == "card_Text") {
+            //        val = "";
+            //    }
 
-                if (line != '') line += ','
+            //    if (line != '') line += ','
 
-                line += ('"' + val + '"');
-            }
+            //    line += ('"' + val + '"');
+            //}
+
+            line = mainDeckarray[i].numberInDeck + " " + mainDeckarray[i].cardName;
             str += line + '\r\n';
         }
+        str += '\r\n';
+
+        // For the Sideboard
+        for (var i = 0; i < sideBoardArray.length; i++) {
+            var line = '';
+
+            line = sideBoardArray[i].numberInSideboard + " " + sideBoardArray[i].cardName;
+            str += line + '\r\n';
+        }
+
         return str;
     }
 }

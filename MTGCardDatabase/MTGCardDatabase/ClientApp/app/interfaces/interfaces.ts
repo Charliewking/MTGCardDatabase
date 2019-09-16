@@ -1,4 +1,4 @@
-﻿export { Card, ScryfallCard, Deck, DeckTrackerRow, Player, DeckCard, MetaDeck };
+﻿export { Card, ScryfallCard, Deck, DeckTrackerRow, Player, DeckCard, MetaDeck, PreviewCard, CardImages };
 
 interface Card {
     name: string;
@@ -24,6 +24,27 @@ interface Card {
     image_Normal: any;
     image_Large: any;
     price: string;
+}
+
+interface PreviewCard {
+    name: string;
+    color1: string;
+    color2: string;
+    colors: string[];
+    image_uris: CardImages;
+    image_Normal: string;
+    set: string;
+    rarity: string;
+    rating1: string;
+    rating2: string;
+    comment1: string;
+    comment2: string;
+}
+
+interface CardImages {
+    small: string;
+    normal: string;
+    large: string;
 }
 
 interface ScryfallCard {
@@ -96,6 +117,7 @@ interface Deck {
     enchantmentCount: number;
     cardCount: number;
     sideboardCount: number;
+    deckQuery: string;
 }
 
 interface DeckCard {

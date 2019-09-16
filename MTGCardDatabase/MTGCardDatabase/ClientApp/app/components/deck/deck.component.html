@@ -66,11 +66,14 @@
             <!--*ngIf="_deckService.decks"-->
             <li *ngFor="let deck of _deckService.decks" class="list-group-item" (mouseover)="hoveredover=deck.name" (mouseout)="hoveredover=''" [ngClass]="[(hoveredover == deck.name) ? 'hoveredDeck' : '', (deckName == deck.name) ? 'selectedDeck' : '' ]">
                 <!-- [ngClass]="[(deckName == deck.name) ? 'selectedDeck' : '']" -->
+
+                <!--  TODO Fix this thing so when you delete a deck it goes away and resets the selected Deck to nothing -->
+
                 <a style="float:left;text-decoration:none;" (click)="setSelectedDeck(deck)"><h4 style="margin-top:2px;">{{deck.name}} (Bo1: {{deck.bo1Wins}}-{{deck.bo1Losses}} Bo3: {{deck.bo3Wins}}-{{deck.bo3Losses}})</h4></a>
-                <button style="float:left;" type="button" class="btn btn-default" (click)="_deckService.showRenamebox = deck.name"><i class="glyphicon-pencil"></i></button>
-                <input class="form-control" type="text" *ngIf="_deckService.showRenamebox == deck.name" (keyup.enter)="_deckService.renameDeck(deck, deckRename)" placeholder="{{deck.name}}" [(ngModel)]="deckRename" />
+                <button style="float:left;" type="button" class="btn btn-default" (click)="_deckService.setRenameBoxFlag(deck.name)"><i class="glyphicon-pencil"></i></button>
+                <input class="form-control" type="text" *ngIf="_deckService.showRenamebox == deck.name" (keyup.enter)="_deckService.renameDeck(deck, deckRename)" placeholder="New Deck Name" [(ngModel)]="deckRename" />
                 <button style="float:left;" *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-secondary" (click)="_deckService.renameDeck(deck, deckRename)">Rename</button>
-                <button *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-default" (click)="_deckService.showRenamebox = ''"><i class="glyphicon-pencil"></i></button>
+                <!--<button *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-default" (click)="_deckService.showRenamebox = ''"><i class="glyphicon-pencil"></i></button>-->
                 <button style="float:right;" *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-success" (click)="_deckService.duplicateDeck(deck)">Duplicate Deck</button>
                 <button style="float:right;" *ngIf="_deckService.showRenamebox == deck.name" type="button" class="btn btn-danger" (click)="removeDeck(deck)">Delete Deck</button>
             </li>
@@ -88,6 +91,14 @@
                 <button class="btn btn-secondary" (click)="_deckService.submitDeckNotes(_deckService.selectedDeck)">Update Deck Notes</button>
             </div>
         </div>
+        <div class="row" style="margin-bottom:5%;">
+            <div class="col-md-12">
+                <textarea cols="80" type="text" class="form-control" placeholder="Paste from MTGGoldfish" [(ngModel)]="_deckService.pasteQuery"></textarea>
+                <button class="btn btn-secondary" (disabled)="_deckService.pasteQuery == ''" (click)="createDeckFromString(_deckService.selectedDeck, _deckService.pasteQuery)">Import MTG Goldfish</button>
+                <button class="btn btn-secondary" (disabled)="_deckService.pasteQuery == ''" (click)="createDeckFromArenaString(_deckService.selectedDeck, _deckService.pasteQuery)">Import MTG Arena</button>
+                <button class="btn btn-secondary" (click)="downloadButtonPush()">Export Decklist to CSV</button>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-12">
                 <div class="row">
@@ -101,10 +112,10 @@
                 <div class="row" style="margin-top:15px;" *ngFor="let card of scryfallService.returnCards | cardNameFilter: queryString">
                     <div class="card mb-3" style="margin-bottom:25px;">
                         <div class="row no-gutters">
-                            <div class="col-sm-4 col-md-4">
-                                <img style="width:150px;" src={{card.image_Normal}} class="card-img" alt={{card.name}}>
+                            <div class="col">
+                                <img style="min-width:200px;max-width:400px;" src={{card.image_Large}} class="card-img" alt={{card.name}}>
                             </div>
-                            <div class="col-sm-8 col-md-8 pull-left">
+                            <div class="col">
                                 <div class="card-body">
                                     <h3 class="card-title">{{card.name}}</h3>
                                     <span class="mana" *ngFor="let mana of card.full_cost" style="margin-bottom:5px;">
@@ -217,6 +228,37 @@
         </table>
     </div>
 </div>
+
+<div class="row" *ngIf="_deckService.selectedDeck.name != ' '" >
+    <div class="col">
+        <button class="form-control btn btn-primary" style="max-width:150px;" (click)="showRandomHand(_deckService.selectedDeck)">Generate Random Hand</button>
+    </div>
+    <div class="col" *ngFor="let card of _deckService.randomHand">
+        <!--*ngIf="_deckService.showHand"-->
+        <div class="card">
+            <div class="card-img-top">
+                <img class="card-img-top" style="background-color:transparent;" src={{card.image_Normal}} alt="Card image cap">
+            </div>
+            <!--<div class="card-body">
+            <div class="row" style="margin-left:1%;">
+                <h5 class="card-title">{{card.name}}</h5>
+            </div>
+            <div class="row" style="margin-left:2%;">
+                <mana-cost style="margin-right:10px;" [mana]="card.mana_Cost"></mana-cost>
+                <h4 style="margin-top: 4px;"> ${{card.price}}</h4>
+            </div>
+            <div class="row" style="margin-left:2%;">
+                <h2 style="margin-top: 4px;">
+                    <a (click)="incrementCardCount(card)" class="btn btn-default btn-circle">+</a>
+                    {{ card.numberInCollection }}
+                    <a (click)="decrementCardCount(card)" class="btn btn-default btn-circle">&nbsp;-&nbsp;</a>
+                </h2>
+            </div>
+        </div>-->
+        </div>
+    </div>
+</div>
+
 <div class="row" *ngIf="_deckService.selectedDeck.name != ' '">
     <div class="col-md-3">
         <h2>New Game Result</h2>

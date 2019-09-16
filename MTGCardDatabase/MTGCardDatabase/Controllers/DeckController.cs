@@ -83,18 +83,20 @@ namespace MTGDatabase.Controllers
         [ProducesResponseType(typeof(string), 400)]
         [ProducesResponseType(typeof(string), 500)]
         [Route("deck/{PlayerName}/{DeckName}")]
-        public async Task<IActionResult> GetAllDecks([FromRoute] string playerName, string deckName)
+        public async Task<IActionResult> GetDeckCards([FromRoute] string playerName, string deckName)
         {
-            TableQuery<DeckEntity> finalQuery = new TableQuery<DeckEntity>().Where(
-                TableQuery.CombineFilters(
-                    TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, playerName),
-                    TableOperators.And,
-                    TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, deckName)));
+            DeckEntity deck = await getDeckCards(playerName, deckName);
 
-            var returnValue = await GetStorageTable(_config.deckTableName).ExecuteQuerySegmentedAsync(finalQuery, token);
+            // Populate Deck Tracker Rows
+            TableQuery<DeckTrackerEntity> deckTrackerquery = new TableQuery<DeckTrackerEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, playerName + "_" + deckName));
 
-            return Ok(returnValue);
+            var trackerRows = await GetStorageTable(_config.deckTrackerTableName).ExecuteQuerySegmentedAsync(deckTrackerquery, token);
+
+            deck.TrackerRows = trackerRows.ToList();
+
+            return Ok(deck);
         }
+
 
         [HttpPost]
         //[ProducesResponseType(typeof(string), 200)]
@@ -292,6 +294,38 @@ namespace MTGDatabase.Controllers
             await GetStorageTable(_config.metaDecksTableName).ExecuteAsync(TableOperation.Insert(metaDeck));
         }
 
+        [HttpGet]
+        [Route("randomHand/{playerName}/{deckname}")]
+        public async Task<IActionResult> GenerateRandomHand([FromRoute] string playerName, [FromRoute] string deckName)
+        {
+            List<DeckCardEntity> deckRepresentation = new List<DeckCardEntity>();
+            List<DeckCardEntity> handRepresentation = new List<DeckCardEntity>();
+
+            DeckEntity deck = await getDeckCards(playerName, deckName);
+
+            foreach (DeckCardEntity card in deck.MainDeck)
+            {
+                for (int i = 0; i < card.NumberInDeck; i++){
+                    deckRepresentation.Add(card);
+                }
+            }
+
+            Random random = new Random();
+            int randomInt = 0;
+
+            for (int j = 0; j < 7; j++)
+            {
+                randomInt = random.Next(0, deckRepresentation.Count);
+
+                DeckCardEntity newCard = deckRepresentation.ElementAt(randomInt);
+                deckRepresentation.RemoveAt(randomInt);
+
+                handRepresentation.Add(newCard);
+            }
+
+            return Ok(handRepresentation);
+        }
+
         private CloudStorageAccount GetStorageAccount()
         {
             return CloudStorageAccount.Parse(_config.mtgdatabaseConnectionString);
@@ -300,6 +334,44 @@ namespace MTGDatabase.Controllers
         private CloudTable GetStorageTable(string tableName)
         {
             return (CloudStorageAccount.Parse(_config.mtgdatabaseConnectionString)).CreateCloudTableClient().GetTableReference(tableName);
+        }
+
+        private async Task<DeckEntity> getDeckCards(string playerName, string deckName)
+        {
+            TableQuery<DeckEntity> deckQuery = new TableQuery<DeckEntity>().Where(
+            TableQuery.CombineFilters(
+            TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, playerName),
+            TableOperators.And,
+            TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, deckName)));
+
+            var returnValue = await GetStorageTable(_config.deckTableName).ExecuteQuerySegmentedAsync(deckQuery, token);
+            DeckEntity deck = returnValue.FirstOrDefault();
+
+            string Player_Deck = playerName + "_" + deckName;
+
+            TableQuery<DeckCardEntity> deckCardquery = new TableQuery<DeckCardEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Player_Deck));
+
+            var deckCards = await GetStorageTable(_config.deckCardTableName).ExecuteQuerySegmentedAsync(deckCardquery, token);
+
+            List<DeckCardEntity> MainDeckTempList = new List<DeckCardEntity>();
+            List<DeckCardEntity> SideboardTempList = new List<DeckCardEntity>();
+
+            foreach (DeckCardEntity deckCard in deckCards.Results)
+            {
+                if (deckCard.NumberInDeck > 0)
+                {
+                    MainDeckTempList.Add(deckCard);
+                }
+                if (deckCard.NumberInSideboard > 0)
+                {
+                    SideboardTempList.Add(deckCard);
+                }
+            }
+
+            deck.MainDeck = MainDeckTempList;
+            deck.Sideboard = SideboardTempList;
+
+            return deck;
         }
     }
 }

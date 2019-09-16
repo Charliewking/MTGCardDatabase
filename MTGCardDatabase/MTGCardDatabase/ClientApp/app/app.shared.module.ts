@@ -14,6 +14,7 @@ import { CollectionComponent } from './components/collection/collection.componen
 import { DeckComponent } from './components/deck/deck.component';
 import { SearchCardsComponent } from './components/searchcards/searchcards.component';
 import { PreviewComponent } from './components/preview/preview.component';
+import { CardEvalComponent } from './components/cardevals/cardeval';
 import { CardNamePipe } from './pipes/card-name.pipe';
 import { CardTextPipe } from './pipes/card-text.pipe';
 import { CardRarityPipe } from './pipes/card-rarity.pipe';
@@ -32,6 +33,7 @@ import { NotificationComponent } from './components/notification/notification.co
         CollectionComponent,
         PreviewComponent,
         NotificationComponent,
+        CardEvalComponent,
         CardNamePipe,
         CardTextPipe,
         CardRarityPipe,
@@ -49,6 +51,7 @@ import { NotificationComponent } from './components/notification/notification.co
             { path: 'searchcards', component: SearchCardsComponent },
             { path: 'deck', component: DeckComponent },
             { path: 'preview', component: PreviewComponent },
+            { path: 'evals', component: CardEvalComponent },
             { path: '**', redirectTo: 'collection' }
         ])
     ],

@@ -1,0 +1,58 @@
+﻿
+
+<div style="font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif">
+
+    <h2>Card Evaluations</h2>
+
+    <div style="position:relative;margin-bottom:20px;">
+        <div id="myCarousel" class="carousel slide" data-interval="false">
+            <div *ngIf="previewCardName != ' ' " class="carousel-inner" role="listbox">
+                <div class="row">
+                    <div class="col-md-8">
+                        <table class="table-striped table-responsive" style="height:800px;overflow:auto;font-size:large;">
+                            <thead>
+                                <tr>
+                                    <th><label>Name</label></th>
+                                    <th>
+                                        <select [(ngModel)]="rarityString" value="Rarity" name="rarityQuery">
+                                            <option value="">Select Rarity</option>
+                                            <option value="mythic">Mythic</option>
+                                            <option value="rare">Rare</option>
+                                            <option value="uncommon">Uncommon</option>
+                                            <option value="common">Common</option>
+                                        </select>
+                                    </th>
+                                    <th>IS Rating</th>
+                                    <th>IS Comments</th>
+                                    <th>PB Rating</th>
+                                    <th>PB Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let card of _httpCardService.previewCards | cardRarityFilter: rarityString | cardNameFilter: queryString; let i = index">
+                                    <td (click)="setPreviewCard(card)">{{card.name}}</td>
+                                    <td>{{card.rarity}}</td>
+                                    <td><input type="text" placeholder="IS Score" [(ngModel)]="card.rating1" /></td>
+                                    <td><input placeholder="IS Comments" [(ngModel)]="card.comment1" type="text" /></td>
+                                    <td><input placeholder="PB Score" [(ngModel)]="card.rating2" type="text" /></td>
+                                    <td><input placeholder="PB Comments" [(ngModel)]="card.comment2" type="text" /></td>
+                                    <td><button (click)="submitRating(card)">Submit</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!--<button (click)="submitRatings()">Submit Ratings</button>-->
+
+                    <div class="col-md-4">
+                        <img style="margin-top:30px;margin-bottom:30px;font-size:5em;font-weight:bold;border-radius:25px;" src={{strings.previewCardURI}} alt="Event Image">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+

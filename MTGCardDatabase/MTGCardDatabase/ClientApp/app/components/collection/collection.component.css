@@ -1,6 +1,40 @@
-﻿.card-img-top {
+﻿img.card-img-top {
     min-width: 200px;
     max-width: 400px;
     background-color: rgba(0,0,0,.2) !important;
     border-radius: 4% !important;
+}
+
+.card-body {
+    min-width: 200px;
+    max-width: 400px;
+    margin-bottom: 5%;
+}
+
+.form-control {
+    margin-left:5px;
+    margin-right:5px;
+}
+
+.main-row {
+    margin-bottom:25px;
+}
+
+.btn-circle {
+    min-height: 10px !important;
+    min-width: 10px !important;
+    max-height: 25px !important;
+    max-width: 25px !important;
+    border-radius: 50% !important;
+}
+
+.hoveredCard::after {
+    display: block;
+    position: relative;
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0, #fff 100%);
+    margin-top: -150px;
+    height: 150px;
+    width: 100%;
+    border-radius: 4% !important;
+    content: '';
 }

@@ -16,7 +16,10 @@ export class DeckService {
     public showRenamebox: string = '';
     public selectedDeck: Deck = {} as Deck;
     public successText: string = '';
+    public pasteQuery: string = '';
     public metaDecks: MetaDeck[] = [];
+    public randomHand: DeckCard[] = [];
+    public showHand: boolean = false;
 
     public deckTrackerRow: DeckTrackerRow = {} as DeckTrackerRow;
     public trackerPlayedAgainst: string = '';
@@ -54,12 +57,30 @@ export class DeckService {
     getDeckDetails(deckOwner: string, deckName: string) {
         this.http.get(this._baseUrl + 'api/decks/deck/' + deckOwner + '/' + deckName).subscribe(result => {
             var returnObject: any = result.json();
-            this.selectedDeck = returnObject[0];
+            this.selectedDeck = returnObject;
         }, error => {
             alert(error.json());
         });
 
-        return this.selectedDeck;
+        //return this.selectedDeck;
+    }
+
+    getRandomHand(deckOwner: string, deckName: string) {
+        this.http.get(this._baseUrl + 'api/decks/randomHand/' + deckOwner + '/' + deckName).subscribe(result => {
+            var returnObject: any = result.json();
+            this.randomHand = returnObject;
+        }, error => {
+            alert(error.json());
+        });
+    }
+
+    setRenameBoxFlag(deckName: string) {
+        if (this.showRenamebox == deckName) {
+            this.showRenamebox = '';
+        }
+        else {
+            this.showRenamebox = deckName;
+        }
     }
 
     //getDeckCards() {
@@ -126,30 +147,33 @@ export class DeckService {
             });
     }
 
-    addCardToDeck(card: Card) {
+    addCardToDeck(card: Card, count: number) {
 
         var deckCard = this.createDeckCard(card);
-        deckCard.numberInDeck = 1;
 
-        this.http.post(this._baseUrl + 'api/deckcards/addcardtodeck/' + this.selectedDeck.constructed, deckCard)
+        this.http.post(this._baseUrl + 'api/deckcards/addcardtodeck/' + this.selectedDeck.constructed + '/' + count, deckCard)
             .subscribe(() => {
                 this.successText = "Card Added Successfully";
-                this.selectedDeck.mainDeck.push(deckCard);
-                this.selectedDeck.cardCount++;
+                deckCard.numberInDeck = count;
+                //this.selectedDeck.mainDeck.push(deckCard);
+                //this.selectedDeck.cardCount++;
+                //this.updateCountsAddCard(card, false, count);
+                this.getDeckDetails(deckCard.owner, deckCard.deckName);
             }, error => {
                 alert(error.json());
             });
     }
 
-    addCardToSideboard(card: Card) {
+    addCardToSideboard(card: Card, count: number) {
 
         var deckCard = this.createDeckCard(card);
-        deckCard.numberInSideboard = 1;
-        this.http.post(this._baseUrl + 'api/deckcards/addcardtosideboard/' + this.selectedDeck.constructed, deckCard)
+        deckCard.numberInSideboard = count;
+        this.http.post(this._baseUrl + 'api/deckcards/addcardtosideboard/' + this.selectedDeck.constructed + '/' + count, deckCard)
             .subscribe(() => {
                 this.successText = "Card Added Successfully";
                 this.selectedDeck.sideboard.push(deckCard);
                 this.selectedDeck.sideboardCount++;
+                this.updateCountsAddCard(card, true, count);
             }, error => {
                 alert(error.json());
             });
@@ -160,6 +184,7 @@ export class DeckService {
             .subscribe(() => {
                 this.selectedDeck.mainDeck.splice(this.selectedDeck.mainDeck.indexOf(card), 1);
                 this.selectedDeck.cardCount--;
+                this.updateCountsRemoveDeckCard(card, false);
             }, error => {
                 alert(error.json());
             });
@@ -171,6 +196,7 @@ export class DeckService {
             return this.http.post(this._baseUrl + 'api/deckcards/incrementSideboard', card)
                 .subscribe(() => {
                     this.selectedDeck.sideboardCount++;
+                    this.updateCountsAddDeckCard(card, sideboard);
                 }, error => {
                     alert(error.json());
                 });
@@ -179,6 +205,7 @@ export class DeckService {
             return this.http.post(this._baseUrl + 'api/deckcards/increment', card)
                 .subscribe(() => {
                     this.selectedDeck.cardCount++;
+                    this.updateCountsAddDeckCard(card, sideboard);
                 }, error => {
                     alert(error.json());
                 });
@@ -191,6 +218,7 @@ export class DeckService {
             return this.http.post(this._baseUrl + 'api/deckcards/decrementSideboard', card)
                 .subscribe(() => {
                     this.selectedDeck.sideboardCount--;
+                    this.updateCountsRemoveDeckCard(card, sideboard);
                 }, error => {
                     alert(error.json());
                 });
@@ -199,6 +227,7 @@ export class DeckService {
             return this.http.post(this._baseUrl + 'api/deckcards/decrement', card)
                 .subscribe(() => {
                     this.selectedDeck.cardCount--;
+                    this.updateCountsRemoveDeckCard(card, sideboard);
                 }, error => {
                     alert(error.json());
                 });
@@ -250,6 +279,18 @@ export class DeckService {
             }, error => {
                 alert(error.json());
             });
+    }
+
+    updateCountsAddCard(card: Card, sideboard: boolean, count: number) {
+
+    }
+
+    updateCountsAddDeckCard(card: DeckCard, sideboard: boolean) {
+
+    }
+
+    updateCountsRemoveDeckCard(card: DeckCard, sideboard: boolean) {
+
     }
 
     createDeckCard(card: Card) {

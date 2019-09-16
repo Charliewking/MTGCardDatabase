@@ -1,38 +1,49 @@
 ﻿import { Injectable, Inject } from "@angular/core";
 import { Http, Response } from '@angular/http';
-import { Card } from '../interfaces/interfaces'
+import { Card, PreviewCard } from '../interfaces/interfaces'
 
 @Injectable()
 export class HttpCardService {
 
     private _baseUrl = '';
     public cards: Card[] = [];
+    public previewCards: PreviewCard[] = [];
     public collectionValue: string = '';
     public errorText: string = '';
+    public currentToken: JSON = {} as JSON;
 
     constructor(private http: Http, @Inject('BASE_URL') baseUrl: string) {
         this._baseUrl = baseUrl;
     }
 
     getCards() {
-        //return this.http.get(this._baseUrl + 'api/cards');
-        this.http.get(this._baseUrl + 'api/cards').subscribe(result => {
-            this.cards = result.json() as Card[];
+        if (this.cards.length == 0) {
+            this.http.get(this._baseUrl + 'api/cards').subscribe(result => {
+                this.currentToken = result.json().token;
+                this.cards = result.json().returnList as Card[];
+            });
+        }
+    }
 
-            //for (let card of this.cards) {
-            //    card.Mana_Cost = card.Mana_Cost.substr(1, (card.Mana_Cost.length - 2));
-            //    card.Full_Cost = card.Mana_Cost.split("}{");
-            //}
-        });
+    getNextPageCards(token: JSON) {
+        this.http.post(this._baseUrl + 'api/cards/next', token)
+            .subscribe(result => {
+                this.currentToken = result.json().token;
+                this.cards = result.json().returnList as Card[];
+            },
+            error => {
+                this.errorText = "Could not get the next page.";
+                alert(error.json());
+            });
     }
 
     getCardsWithFilter(filter: string) {
         return this.http.get(this._baseUrl + 'api/cards/' + filter);
     }
 
-    addCard(card: Card) {
+    addCard(card: Card, count: number) {
 
-        return this.http.post(this._baseUrl + 'api/cards/addCard', card)
+        return this.http.post(this._baseUrl + 'api/cards/addCard/' + count.toString(), card)
             .subscribe(error => {
                 this.errorText = "The Card already exists in the collection.";
                 alert(error.json());
@@ -82,5 +93,22 @@ export class HttpCardService {
 
     getCollectionValue() {
         return this.http.get(this._baseUrl + 'api/cards/value');
+    }
+
+    getPreviewCards(setName: string) {
+        if (this.cards.length == 0) {
+            this.http.get(this._baseUrl + 'api/cards/preview/' + setName).subscribe(result => {
+                this.currentToken = result.json().token;
+                this.previewCards = result.json() as PreviewCard[];
+            });
+        }
+    }
+
+    addPreviewCard(previewCard: PreviewCard) {
+
+        return this.http.post(this._baseUrl + 'api/cards/preview', previewCard)
+            .subscribe(data => { }, error => {
+                alert(error.json());
+            });
     }
 }

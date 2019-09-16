@@ -66,5 +66,6 @@ namespace MTGDatabase.Models
         public int AverageCMC { get; set; }
         public int CardCount { get; set; }
         public int SideboardCount { get; set; }
+        public string DeckQuery { get; set; }
     }
 }

@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\app\components\cardevals\cardeval.ts" />
     <None Remove="ClientApp\app\components\manacost\manacost.component.ts" />
     <None Remove="ClientApp\app\components\notification\notification.component.ts" />
     <None Remove="ClientApp\app\components\preview\preview.component.ts" />
@@ -37,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\app\components\cardevals\cardeval.ts" />
     <TypeScriptCompile Include="ClientApp\app\components\manacost\manacost.component.ts" />
     <TypeScriptCompile Include="ClientApp\app\components\notification\notification.component.ts" />
     <TypeScriptCompile Include="ClientApp\app\components\preview\preview.component.ts" />
@@ -55,6 +57,7 @@
 
   <ItemGroup>
     <Folder Include="ClientApp\app\assets\magic-mana-embossed\" />
+    <Folder Include="ClientApp\app\assets\fonts\" />
     <Folder Include="ClientApp\app\directives\" />
   </ItemGroup>
 

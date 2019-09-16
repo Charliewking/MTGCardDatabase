@@ -1,10 +1,11 @@
 <div class="container-fluid">
-    <h1>Collection</h1>
+    <div class="row main-row">
+        <div class="col">
+            <h1>Collection</h1>
+        </div>
+    </div>
 
-    <p *ngIf="!_httpCardService.cards[1]"><em>Loading...</em></p>
-
-    <div class="row" style="margin-bottom:25px;">
-
+    <div class="row main-row">
         <div class="col-sm-6">
             <form class="form-inline">
                 <div class="form-group mx-sm-3 mb-2">
@@ -17,12 +18,17 @@
                     </select>
 
                     <input class="form-control" type="text" id="searchCollection1" [(ngModel)]="queryString" placeholder="Search Collection" name="searchQuery">
+                    <!--<button class="form-control btn btn-success" (click)="_httpCardService.searchCollection(queryString)">Search For Card on Scryfall</button>-->
+                    <button class="form-control btn btn-success" (click)="_scryfallService.getCard(queryString)">Search For Card on Scryfall</button>
                 </div>
             </form>
 
             <h4 *ngIf="collectionValue != ''" >Collection Value ${{collectionValue}}</h4>
         </div>
-        <div style="margin-top:5px;" class="col-sm-6 pull-left">
+    </div>
+
+    <div class="row main-row">
+        <div class="col">
             <a (click)="setFilter('G')" *ngIf="!greenFilter"><img src="../../assets/magic-mana-small/mana_g.png" style="height:25px;width:25px;" /></a>
             <a (click)="setFilter('G')" *ngIf="greenFilter"><img src="../../assets/magic-mana-embossed/mana_g.png" style="height:25px;width:25px;" /></a>
 
@@ -40,53 +46,58 @@
         </div>
     </div>
 
+    <div class="row main-row">
+        <div class="col">
+            <notification *ngIf="_httpCardService.errorText != ''" [alert]="_httpCardService.errorText"></notification>
+        </div>
+    </div>
 
-    <!--<div>
-        <div class="list-group">
-            <div class="row" *ngFor="let card of _httpCardService.cards | cardRarityFilter: rarityString | cardTextFilter: queryString; let i = index" >
-                <div class="col-sm-1"></div>
-                <div class="col-sm-10">
-                    <div class="row">
-                        <div class="col-sm-5">
-                            <h2>{{card.name}}</h2>
-                        </div>
-                        <div class="col-sm-2">
-                            <mana-cost [mana]="card.mana_Cost"></mana-cost>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-5">
-                            <p class="card-text">{{card.card_Text}}</p>
-                        </div>
-                        <div class="col-sm-4">
-                            <a (click)="addCard(card)" class="btn btn-sm btn-primary">Add to Deck</a>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-top:10px;">
-                        <div class="col-xs-4">
-                            <h4 style="float:left;margin-right:10px;font-weight:bolder;">{{ card.numberInCollection }}</h4>
-                            <button type="button" (click)="incrementCardCount(card)" class="btn btn-sm">+</button>
-                            <button type="button" (click)="decrementCardCount(card)" class="btn btn-sm ">-</button>
-                        </div>
-                        <div class="col-xs-2">
-
-                        </div>
-                    </div>
+    <div class="row main-row">
+        <div class="col" *ngIf="!_httpCardService.cards[1]">
+            <h1><em>Loading...</em></h1>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-6" *ngFor="let card of _httpCardService.cards | cardRarityFilter: rarityString | cardTextFilter: queryString; let i = index">
+            <div class="card">
+                <div class="card-img-top">
+                    <!--(mouseover)="hoveredover=card.name" (mouseout)="hoveredover=''" [ngClass]="[(hoveredover == card.name) ? 'hoveredCard' : '']"-->
+                    <img class="card-img-top" style="background-color:transparent;" src={{card.image_Normal}} alt="Card image cap">
+                    <!--<h2 *ngIf="hoveredover == card.name" style="color:black;z-index:9;margin-top:-45px;position:absolute;margin-left:auto;margin-right:auto;width:auto;">
+                    <a (click)="incrementCardCount(card)" class="btn btn-default btn-circle">+</a>
+                    {{ card.numberInCollection }}
+                    <a (click)="decrementCardCount(card)" class="btn btn-default btn-circle">&nbsp;-&nbsp;</a>
+                </h2>-->
                 </div>
-                <div class="col-sm-1 pull-left">
-                    <p *ngIf="card.numberInCollection > 0">
-                        <button type="button" (click)="removeCard(card)" class="btn btn-sm btn-danger">Delete Card</button>
-                    <p *ngIf="card.numberInCollection < 1">Card Removed</p>
+                <div class="card-body">
+                    <div class="row" style="margin-left:1%;">
+                        <h5 class="card-title">{{card.name}}</h5>
+                    </div>
+                    <div class="row" style="margin-left:2%;">
+                        <mana-cost style="margin-right:10px;" [mana]="card.mana_Cost"></mana-cost>
+                        <h4 style="margin-top: 4px;"> ${{card.price}}</h4>
+                    </div>
+                    <div class="row" style="margin-left:2%;">
+                        <h2 style="margin-top: 4px;"> 
+                            <a (click)="incrementCardCount(card)" class="btn btn-default btn-circle">+</a>                
+                            {{ card.numberInCollection }} 
+                            <a (click)="decrementCardCount(card)" class="btn btn-default btn-circle">&nbsp;-&nbsp;</a>
+                        </h2>
+                    </div>
+                    <!--<p class="card-text">{{card.card_Text}}</p>-->
+                    <!--<br />-->
+                    <!--<button style="margin:auto;" (click)="addCard(card)" class="btn">Add to Deck</button>-->
                 </div>
-                <hr />
             </div>
         </div>
-    </div>-->
-
-    <notification *ngIf="_httpCardService.errorText != ''" [alert]="_httpCardService.errorText" ></notification>
+    </div>
 
     <div class="row">
-        <div class="col" *ngFor="let card of _httpCardService.cards | cardRarityFilter: rarityString | cardTextFilter: queryString; let i = index">
+        <div class="col">
+            <button class="btn btn-primary form-control" (click)="_httpCardService.getNextPageCards(_httpCardService.currentToken)">Next 100 Cards</button>
+        </div>
+    </div>
+
+    <div class="row main-row">
+        <div class="col" *ngFor="let card of _scryfallService.returnCards">
             <div class="card">
                 <img class="card-img-top" style="background-color:transparent;" src={{card.image_Normal}} alt="Card image cap">
                 <div class="card-body">
@@ -98,40 +109,8 @@
                         <h4 style="margin-top: 4px;"> ${{card.price}}</h4>
                     </div>
                     <div class="row" style="margin-left:2%;">
-                        <a (click)="incrementCardCount(card)" class="btn">+</a>
-                        <h4 style="margin-top: 4px;">{{ card.numberInCollection }}</h4>
-                        <a (click)="decrementCardCount(card)" class="btn">-</a>
-                    </div>
-                    <!--<p class="card-text">{{card.card_Text}}</p>-->
-                    <!--<br />-->
-                    <!--<button style="margin:auto;" (click)="addCard(card)" class="btn">Add to Deck</button>-->
-                </div>
-            </div>
-        </div>
-        <div>
-            <button class="btn btn-success" (click)="_scryfallService.getCard(queryString)">Search For Card on Scryfall</button>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="row" style="margin-top:15px;" *ngFor="let card of _scryfallService.returnCards">
-                    <div class="card mb-3" style="margin-bottom:25px;">
-                        <div class="row no-gutters">
-                            <div class="col-sm-4 col-md-4">
-                                <img style="width:150px;" src={{card.image_Normal}} class="card-img" alt={{card.name}}>
-                            </div>
-                            <div class="col-sm-8 col-md-8 pull-left">
-                                <div class="card-body">
-                                    <h3 class="card-title">{{card.name}}</h3>
-                                    <span class="mana" *ngFor="let mana of card.full_cost" style="margin-bottom:5px;">
-                                        <p style="position:absolute;margin-left:1px;margin-top:1px;" *ngIf="isDigit(mana)">{{mana}}</p>
-                                        <img style="height:15px;width:15px;margin-left:-3px;" [src]="getPath(mana)" />
-                                    </span>
-                                    <p class="card-text">{{card.card_Text}}</p>
-                                    <p class="card-text"></p>
-                                    <a (click)="addCard(card)" class="btn btn-primary">Add to Collection</a>
-                                </div>
-                            </div>
-                        </div>
+                        <input class="form-control" [(ngModel)]="addCardCount" />
+                        <a (click)="addCard(card, addCardCount)" class="btn btn-primary form-control">Add {{addCardCount}} to Collection</a>
                     </div>
                 </div>
             </div>

@@ -26,10 +26,10 @@ export class SearchCardsComponent {
         this._scryfallService = scryfallService;
     }
 
-    getSetCards(set: string) {
+    getSet(set: string) {
         let jsonReturnData: Card[] = [];
         let jsonReturnData2: Card[] = [];
-        this._scryfallService.getCards(set).subscribe(result => {
+        this._scryfallService.getSet(set).subscribe(result => {
             this.nextPage = (result.json()).next_page;
             jsonReturnData = (result.json()).data;
             this._scryfallService.getNewPage(this.nextPage).subscribe(result => {
@@ -55,7 +55,7 @@ export class SearchCardsComponent {
     }
 
     addCard(card: Card) {
-        this._httpCardService.addCard(card);
+        this._httpCardService.addCard(card, 1);
         //card.added = true;
     }
 
